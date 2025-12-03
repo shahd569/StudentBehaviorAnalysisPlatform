@@ -1,0 +1,246 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  //url = env("DATABASE_URL")
+}
+
+enum userRole {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+enum courseStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum submissionStatus {
+  SUBMITTED
+  GRADED //تم تقييم الواجب
+}
+
+enum TypeOfVideoInteraction {
+  PLAY
+  STOP
+  RATE_CHANGE // x1.5 تغيير سرعة تشغيل الفيديو مثلا 
+  PAUSE
+  SEEK //التنقل للامام او الخلف
+}
+
+enum SessionStatus {
+  ENDED
+  ACTIVE
+}
+
+enum AlerType {
+  PERFORMANCE_ALERT // (نتيجة ضعيفة - تاخر في الواجب) تنبيه اداء 
+  RECOMMENDATION
+  DUE_DATE_REMINDER // تذكيؤ بموعد تسليم قادم
+}
+
+enum TriggerReason {
+  LOW_QUIZ_SCORE
+  LOW_ACTIVITY
+  LATE_SUBMISSION
+}
+
+model Users{
+  id  Int  @id @default(autoincrement())
+  role  userRole
+  email String  @unique
+  hashedPassword  String
+  firstName String
+  lastName  String
+  profilePictureUrl String?
+  registrationDate  DateTime @default(now())
+  universityId  String?  @unique 
+  college String?
+  major String?
+  academicYear  Int?
+  employeeId  String? @unique
+  taughtCourses Course[] @relation("TaughtCourses")
+  enrollments Enrollment[]
+  assignmentSubmission  AssignmentSubmission[]
+  attempt QuizAttempt[]
+  interactions VideoInteraction[]
+  sessions UserSession[]
+  alerts AlertAndRecommendations[]
+}
+
+model Course{
+  id  Int  @id @default(autoincrement())
+  courseName  String
+  description String?
+  academicYear  Int
+  semester  String
+  instructorId  Int
+  status  courseStatus
+  instructor  Users @relation(fields: [instructorId],references:[id],onDelete: Cascade,name:"TaughtCourses")
+  enrollments Enrollment[]
+  lessons Lesson[]
+}
+
+model Enrollment{
+  id  Int  @id @default(autoincrement())
+  studentId Int
+  courseId Int
+  enrollmentDate DateTime @default(now())
+  student Users @relation(fields: [studentId],references: [id],onDelete: Cascade)
+  course  Course  @relation(fields: [courseId],references: [id],onDelete: Cascade)
+  @@unique([studentId,courseId])
+}
+
+model Lesson{
+  id  Int  @id @default(autoincrement())
+  title String
+  description String?
+  sequenceNumber  Int
+  courseId  Int
+  course  Course  @relation(fields: [courseId],references: [id],onDelete: Cascade)
+  videos  Video[]
+  assignments Assignment[]
+  quiz  Quiz[]
+  alertsAndRecommendations  AlertAndRecommendations[]
+}
+
+model Video{
+  id  Int  @id @default(autoincrement())
+  url String
+  duration Int
+  lessonId  Int
+  lesson  Lesson  @relation(fields: [lessonId],references: [id],onDelete: Cascade)
+  interactions VideoInteraction[]
+}
+
+model Assignment{
+  id  Int  @id @default(autoincrement())
+  content String
+  title String
+  deliveryDate  DateTime
+  createdAt DateTime @default(now())
+  // ["pdf","docs","zip"]
+  allowedExtensions String[]
+  maxScore  Int
+  lessonId  Int
+  lesson  Lesson  @relation(fields: [lessonId],references: [id],onDelete: Cascade)
+  submissions  AssignmentSubmission[] 
+  resources AssignmentResource[]
+}
+
+//تسليمات الطلاب
+model AssignmentSubmission{
+  id  Int  @id @default(autoincrement())
+  finalScore Float?
+  assignmentId  Int
+  studentId Int
+  submissionUrl String? 
+  submittedAt DateTime @default(now())
+  teacherComment  String?
+  status  submissionStatus
+  assignment  Assignment  @relation(fields: [assignmentId],references: [id],onDelete: Cascade)
+  student Users @relation(fields: [studentId],references: [id],onDelete: Cascade)
+  @@unique([assignmentId,studentId])
+}
+
+model AssignmentResource{
+  id  Int  @id @default(autoincrement())
+  resourceURL String
+  // Pdf or link or image
+  resourceType  String
+  description String?
+  assignmentId Int
+  assignment  Assignment @relation(fields: [assignmentId],references: [id],onDelete: Cascade)
+}
+
+model Quiz{
+  id  Int  @id @default(autoincrement())
+  lessonId Int
+  title String
+  description String?
+  maxScore  Int
+  timeLimit Int? //الحد الزمني للاختبار بالدقائق
+  startDate DateTime //متى يبدأ الاختبار بالظهور
+  dueDate DateTime //موعد التسليم النهائي للاختبار
+  lesson  Lesson @relation(fields: [lessonId],references: [id],onDelete: Cascade)
+  questions Question[]
+  attempts QuizAttempt[]
+}
+
+model Question{
+  id  Int  @id @default(autoincrement())
+  quizId Int
+  questionText  String
+  options String[]
+  correctAnswerIndex  Int // options فهرس الاجابة الصحيحة داخل المصفوفة
+  scoreValue  Int //الدرجة المخصصة لهذا السؤال
+  quiz Quiz @relation(fields: [quizId],references: [id],onDelete: Cascade)
+}
+
+model QuizAttempt{
+  id  Int  @id @default(autoincrement())
+  quizId  Int
+  studentId Int
+  startTime DateTime
+  finishTime  DateTime?
+  score Float?
+  submittedAnswers  Int[] //مصفوفة فهارس بتحتوي ع اجابات الطالب
+  quiz Quiz @relation(fields: [quizId],references: [id],onDelete: Cascade)
+  student Users @relation(fields: [studentId],references: [id],onDelete: Cascade)
+  @@unique([studentId,quizId])
+}
+
+model VideoInteraction{
+  id  Int  @id @default(autoincrement())
+  timestamp DateTime @default(now()) // متى وقع الحدث
+  studentId Int
+  videoId Int
+  interactionType TypeOfVideoInteraction
+  currentTimeSeconds  Int //مكان وقوع الحدث داخل الفيديو اي في اي ثانية من الفيديو وقع التفاعل
+  // SEEK RATE_CHANGE مهمة لل 
+  value Float? //(-10 +10) SEEK كم ثانية تم التقديم او الارجاع عند ال      
+  student Users @relation(fields: [studentId],references: [id],onDelete: Cascade)
+  video Video @relation(fields: [videoId],references: [id],onDelete: Cascade)
+}
+
+model UserSession{
+  id  Int  @id @default(autoincrement())
+  studentId Int
+  startTime DateTime
+  endTime DateTime? //اذا كانت الجلسة نشطة حاليا يتم تحديثه باستمرار باحدث تفاعل للطالب null
+  status  SessionStatus @default(ACTIVE) //بعد 10 دقائق من الخمول مثلا 'ENDED'
+  student Users @relation(fields: [studentId],references: [id],onDelete: Cascade)
+  activities  PlatformActivity[]
+}
+
+model PlatformActivity{
+  id  Int  @id @default(autoincrement())
+  sessionId Int
+  timestamp  DateTime @default(now())
+  activityType  String // FORM_SUBMIT BUTTON_CLICK PAGE_LOAD  نوع الحدث مثلا 
+  pageUrl String // رابط الصفحة اللي تفاعل معها الطالب
+  session UserSession @relation(fields: [sessionId],references: [id],onDelete: Cascade)
+}
+
+model AlertAndRecommendations{
+  id  Int  @id @default(autoincrement())
+  alertType AlerType
+  triggerReason TriggerReason
+  content String
+  createdAt DateTime @default(now())
+  isRead  Boolean @default(false)
+  studentId Int
+  lessonId  Int?
+  student Users @relation(fields: [studentId],references: [id],onDelete: Cascade)
+  lesson  Lesson?  @relation(fields: [lessonId],references: [id],onDelete: Cascade)
+}
