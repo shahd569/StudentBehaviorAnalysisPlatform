@@ -11,7 +11,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  //url = env("DATABASE_URL")
 }
 
 enum userRole {
@@ -89,6 +88,7 @@ model Course{
   instructor  Users @relation(fields: [instructorId],references:[id],onDelete: Cascade,name:"TaughtCourses")
   enrollments Enrollment[]
   lessons Lesson[]
+  announcements Announcement[]
 }
 
 model Enrollment{
@@ -243,4 +243,14 @@ model AlertAndRecommendations{
   lessonId  Int?
   student Users @relation(fields: [studentId],references: [id],onDelete: Cascade)
   lesson  Lesson?  @relation(fields: [lessonId],references: [id],onDelete: Cascade)
+}
+
+model Announcement{
+  id  Int  @id @default(autoincrement())
+  content String
+  createdAt DateTime @default(now())
+  attachmentURL String?
+  title String
+  courseId  Int?
+  course  Course?  @relation(fields: [courseId],references: [id],onDelete: SetNull)
 }
