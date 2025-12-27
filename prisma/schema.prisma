@@ -75,6 +75,8 @@ model Users{
   interactions VideoInteraction[]
   sessions UserSession[]
   alerts AlertAndRecommendations[]
+  sentMessages  Message[] @relation("SentMessages")
+  receivedMessages  Message[] @relation("ReceivedMessages")
 }
 
 model Course{
@@ -253,4 +255,15 @@ model Announcement{
   title String
   courseId  Int?
   course  Course?  @relation(fields: [courseId],references: [id],onDelete: SetNull)
+}
+
+model Message{
+  id  Int @id @default(autoincrement())
+  content String
+  createdAt DateTime  @default(now())
+  isRead  Boolean @default(false)
+  senderId  Int
+  receivedId  Int
+  sender  Users @relation("SentMessages",fields: [senderId],references: [id],onDelete: Cascade)
+  receiver  Users @relation("ReceivedMessages",fields: [receivedId],references: [id],onDelete: Cascade)
 }
