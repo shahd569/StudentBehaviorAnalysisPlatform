@@ -10,6 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum userRole {
@@ -265,4 +266,20 @@ model Message{
   receivedId  Int
   sender  Users @relation("SentMessages",fields: [senderId],references: [id],onDelete: Cascade)
   receiver  Users @relation("ReceivedMessages",fields: [receivedId],references: [id],onDelete: Cascade)
+}
+
+model AuthorizedStudent{
+  id  Int @id @default(autoincrement())
+  universityId  String @unique
+  firstName String
+  lastName  String
+  isRegistered  Boolean @default(false)  
+}
+
+model AuthorizedStuff{
+  id  Int @id @default(autoincrement())
+  employeeId  String @unique
+  firstName String
+  lastName  String
+  isRegistered  Boolean @default(false)  
 }
