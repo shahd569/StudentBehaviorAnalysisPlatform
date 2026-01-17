@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["views"]
 }
 
 datasource db {
@@ -282,4 +283,13 @@ model AuthorizedStuff{
   firstName String
   lastName  String
   isRegistered  Boolean @default(false)  
+}
+
+view StudentPerformanceView {
+  studentId       Int    @unique
+  studentName     String
+  teacherId       Int
+  academicScore   Float
+  commitmentScore Float
+  activityScore   Float
 }
