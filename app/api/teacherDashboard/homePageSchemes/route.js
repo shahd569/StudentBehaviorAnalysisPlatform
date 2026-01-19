@@ -2,19 +2,18 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../lib/auth";
 import { NextResponse } from "next/server";
 import { prisma } from "../../../../lib/prisma";
-import { gte } from "zod";
 
 export async function GET() {
   try {
-    // const session = getServerSession(authOptions);
-    // if (!session || !session.user || session.user.role !== "TEACHER") {
-    //   return NextResponse.json(
-    //     { message: "غير مسموح لك بالوصول لهذه البيانات" },
-    //     { status: 401 }
-    //   );
-    // }
-    // const teacherId = parseInt(session.user.id);
-    const teacherId = 17;
+    const session = getServerSession(authOptions);
+    if (!session || !session.user || session.user.role !== "TEACHER") {
+      return NextResponse.json(
+        { message: "غير مسموح لك بالوصول لهذه البيانات" },
+        { status: 401 }
+      );
+    }
+    const teacherId = parseInt(session.user.id);
+    // const teacherId = 17;
     const studentsData = await prisma.StudentPerformanceView.findMany({
       where: {
         teacherId: teacherId,
