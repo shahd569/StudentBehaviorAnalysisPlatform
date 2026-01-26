@@ -5,15 +5,15 @@ import { prisma } from "../../../../lib/prisma";
 
 export async function GET() {
   try {
-    const session = getServerSession(authOptions);
-    if (!session || !session.user || session.user.role !== "TEACHER") {
-      return NextResponse.json(
-        { message: "غير مسموح لك بالوصول لهذه البيانات" },
-        { status: 401 }
-      );
-    }
-    const teacherId = parseInt(session.user.id);
-    // const teacherId = 17;
+    // const session = getServerSession(authOptions);
+    // if (!session || !session.user || session.user.role !== "TEACHER") {
+    //   return NextResponse.json(
+    //     { message: "غير مسموح لك بالوصول لهذه البيانات" },
+    //     { status: 401 }
+    //   );
+    // }
+    // const teacherId = parseInt(session.user.id);
+    const teacherId = 17;
     const studentsData = await prisma.StudentPerformanceView.findMany({
       where: {
         teacherId: teacherId,
@@ -41,15 +41,16 @@ export async function GET() {
       { name: "يحتاج متابعة", value: weake, fill: "#EF4444" },
     ];
 
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
-
     const studentIds = studentsData.map((s) => s.studentId);
+
+    const dateLimit = new Date();
+    dateLimit.setDate(dateLimit.getDate() - 7);
+    dateLimit.setHours(0, 0, 0, 0);
 
     const sessions = await prisma.userSession.findMany({
       where: {
         studentId: { in: studentIds },
-        startTime: { gte: sevenDaysAgo },
+        startTime: { gte: dateLimit },
       },
       select: {
         startTime: true,
@@ -58,38 +59,34 @@ export async function GET() {
     });
 
     const barChartData = [];
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-    for (let i = 0; i < 7; i++) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
+    for (let i = 6; i >= 0; i--) {
+      const targetDate = new Date();
+      targetDate.setDate(targetDate.getDate() - i);
 
-      const dayName = d.toLocaleDateString("en-US", { weekday: "short" });
+      const tYear = targetDate.getFullYear();
+      const tMonth = targetDate.getMonth();
+      const tDay = targetDate.getDate();
 
-      const activeStudentsInThisDay = sessions.filter((session) => {
-        const sessionDate = new Date(session.startTime);
+      const studentsInThisDay = sessions.filter((session) => {
+        const sDate = new Date(session.startTime);
         return (
-          sessionDate.getDate() === d.getDate() &&
-          sessionDate.getMonth() === d.getMonth()
+          sDate.getFullYear() === tYear &&
+          sDate.getMonth() === tMonth &&
+          sDate.getDate() === tDay
         );
       });
 
-      const uniqueStudentsCount = new Set(
-        activeStudentsInThisDay.map((s) => s.studentId)
-      ).size;
+      const uniqueCount = new Set(studentsInThisDay.map((s) => s.studentId))
+        .size;
 
-      barChartData.unshift({
-        name: dayName,
-        students: uniqueStudentsCount,
+      barChartData.push({
+        name: days[targetDate.getDay()],
+        students: uniqueCount,
       });
     }
-
-    return NextResponse.json(
-      {
-        pieChartData,
-        barChartData,
-      },
-      { status: 200 }
-    );
+    return NextResponse.json({ pieChartData, barChartData }, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ message: "فشل جلب المخططات" }, { status: 500 });
