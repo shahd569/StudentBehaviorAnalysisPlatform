@@ -15,6 +15,7 @@ const Table = ({ data }) => {
         borderCollapse: "separate",
         borderSpacing: "0 10px",
         color: "#626262",
+        textAlign: "center",
       }}
     >
       <thead>

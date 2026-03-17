@@ -3,7 +3,6 @@ import Table from "@/components/Table";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { useState, useEffect } from "react";
-import { includes } from "zod";
 
 export default function StudentsTable() {
   // 1. حالة لتخزين كل الطلاب القادمين من الـ API (البيانات الأصلية)
@@ -28,9 +27,16 @@ export default function StudentsTable() {
         setAllStudents(data.students);
         setDisplayedStudents(data.students); // في البداية نعرض كل الطلاب
 
-        const uniqeCourses = [
-          ...new Set(data.students.map((s) => s.courses).filter(Boolean)),
-        ];
+        const allCourses = data.students.flatMap((s) => {
+          if (!s.courses) return [];
+          const courseArray = Array.isArray(s.courses)
+            ? s.courses
+            : s.courses.split("،").map((item) => item.trim());
+          return courseArray;
+        });
+
+        const uniqeCourses = [...new Set(allCourses)];
+
         setCourses(uniqeCourses);
       } catch (error) {
         console.error("Error fetching students:", error);
@@ -61,9 +67,18 @@ export default function StudentsTable() {
       result = result.filter((student) => student.activity === activityFilter);
     }
     if (objectFilter !== "الكل") {
-      result = result.filter((s) => s.courses === includes(objectFilter));
+      result = result.filter((student) => {
+        if (!student.courses) return false;
+
+        const studentCoursesText = Array.isArray(student.courses)
+          ? student.courses.join(" ")
+          : student.courses;
+
+        return studentCoursesText.includes(objectFilter);
+      });
     }
     // تحديث الجدول بالنتيجة النهائية
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDisplayedStudents(result);
   }, [
     searchQuery,
