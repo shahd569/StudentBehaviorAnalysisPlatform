@@ -1,17 +1,42 @@
-import { faSearch } from "@fortawesome/free-solid-svg-icons";
+"use client";
+
+import {
+  faSearch,
+  faCommentDots,
+  faBullhorn,
+  faUserAlt,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCommentDots } from "@fortawesome/free-solid-svg-icons";
-import { faBullhorn } from "@fortawesome/free-solid-svg-icons";
-import { faUserAlt } from "@fortawesome/free-solid-svg-icons";
-// import{fa}
+import useSWR from "swr";
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+interface NavbarData {
+  fullName: string;
+  avatar: string;
+  role: string;
+  notifications: {
+    messagesCount: number;
+    alertsCount: number;
+  };
+}
+
 const Navbar = () => {
+  const { data, error } = useSWR<NavbarData>("/api/navbar", fetcher, {
+    refreshInterval: 30000,
+  });
+
+  if (error)
+    return <div className="p-4 text-danger">خطأ في تحميل البيانات</div>;
+
   return (
     <div
-      className="d-flex align-items-center justify-content-between p-4"
+      className="d-flex align-items-center justify-content-between p-4 shadow-sm"
       style={{ height: "60px" }}
     >
+      {/* أيقونة الرسائل */}
       <div
-        className="rounded-circle d-flex align-items-center justify-content-center m-3"
+        className="rounded-circle d-flex align-items-center justify-content-center m-3 position-relative"
         style={{
           width: "28px",
           height: "24px",
@@ -22,8 +47,26 @@ const Navbar = () => {
         <FontAwesomeIcon
           icon={faCommentDots}
           style={{ color: "gray", width: "18px" }}
-        ></FontAwesomeIcon>
+        />
+        {/* إظهار عدد الرسائل فقط إذا كان أكبر من صفر */}
+        {data?.notifications?.messagesCount ? (
+          <div
+            className="position-absolute d-flex align-items-center justify-content-center rounded-circle text-white"
+            style={{
+              width: "18px",
+              height: "18px",
+              top: "-10px",
+              right: "-10px",
+              backgroundColor: "rgba(250, 49, 49, 1)",
+              fontSize: "10px",
+            }}
+          >
+            {data?.notifications.messagesCount}
+          </div>
+        ) : null}
       </div>
+
+      {/* أيقونة التنبيهات */}
       <div
         className="rounded-circle d-flex align-items-center justify-content-center position-relative"
         style={{ width: "28px", height: "24px", cursor: "pointer" }}
@@ -31,57 +74,67 @@ const Navbar = () => {
         <FontAwesomeIcon
           icon={faBullhorn}
           style={{ color: "gray", width: "18px" }}
-        ></FontAwesomeIcon>
-        <div
-          className="position-absolute d-flex align-items-center justify-content-center rounded-circle text-white"
-          style={{
-            width: "20px",
-            height: "20px",
-            top: "-12px",
-            right: "-12px",
-            backgroundColor: "rgba(250, 49, 49, 1)",
-          }}
-        >
-          1
-        </div>
+        />
+        {/* إظهار عدد التنبيهات فقط إذا كان أكبر من صفر */}
+        {data?.notifications?.alertsCount ? (
+          <div
+            className="position-absolute d-flex align-items-center justify-content-center rounded-circle text-white"
+            style={{
+              width: "18px",
+              height: "18px",
+              top: "-10px",
+              right: "-10px",
+              backgroundColor: "rgba(250, 49, 49, 1)",
+              fontSize: "10px",
+            }}
+          >
+            {data?.notifications.alertsCount}
+          </div>
+        ) : null}
       </div>
-      {/* Search bar
-            <div className="hidden md:flex items-center gap-2 rounded-full ring-[1.5px] ring-gray-300 px-2" >
-               <FontAwesomeIcon icon={faSearch} style={{color:"gray", width:"14px"}}></FontAwesomeIcon>
-               <input type="text" placeholder="Search..." className="w-[200px] p-2" ></input>
-            </div> */}
-      {/*  Icones and user */}
+
+      {/* معلومات المستخدم */}
       <div className="d-flex align-items-center justify-content-end gap-4 w-100">
         <div className="d-flex flex-column">
           <span
-            className="fw-medium"
-            style={{ fontWeight: "bold", fontSize: "16px" }}
+            className="fw-medium text-end"
+            style={{ fontWeight: "bold", fontSize: "16px", color: "black" }}
           >
-            Sara Sobh
+            {data?.fullName || "جاري التحميل..."}
           </span>
           <span
             className="text-secondary text-end"
-            style={{ fontSize: "12px" }}
+            style={{ fontSize: "12px", color: "black" }}
           >
-            Admin
+            {data?.role || "Teacher"}
           </span>
         </div>
+
+        {/* الصورة الشخصية */}
         <div
-          className="rounded-circle d-flex align-items-center justify-content-center"
+          className="rounded-circle d-flex align-items-center justify-content-center overflow-hidden"
           style={{
             backgroundColor: "rgb(160, 49, 250)",
             width: "45px",
             height: "45px",
           }}
         >
-          <FontAwesomeIcon
-            icon={faUserAlt}
-            className=""
-            style={{ width: "30px", color: "white" }}
-          ></FontAwesomeIcon>
+          {data?.avatar ? (
+            <img
+              src={data.avatar}
+              alt="Profile"
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          ) : (
+            <FontAwesomeIcon
+              icon={faUserAlt}
+              style={{ width: "25px", color: "white" }}
+            />
+          )}
         </div>
       </div>
     </div>
   );
 };
+
 export default Navbar;

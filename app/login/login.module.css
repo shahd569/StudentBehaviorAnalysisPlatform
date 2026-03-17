@@ -1,0 +1,325 @@
+.container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  min-height: 100vh;
+  background-image: url("/image/choosing-bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  font-family: "Cairo", sans-serif;
+  direction: ltr;
+  position: relative;
+}
+
+.container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.5);
+  z-index: 0;
+}
+
+.card {
+  display: flex;
+  width: 960px;
+  height: 600px;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.illustrationSide {
+  flex: 1;
+  position: relative;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 0;
+  overflow: hidden;
+  top: 50%;
+  left: 27%;
+}
+
+.illustrationLogSide {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 0;
+  overflow: hidden;
+}
+
+.bigLogText {
+  position: absolute;
+  top: 0.4%;
+  left: 210px;
+  font-size: 7rem;
+  font-weight: 900;
+  color: #c198e0;
+  line-height: 1.24;
+  z-index: 1;
+  font-family: "Arial", sans-serif;
+}
+
+.illustrationImage {
+  position: relative;
+  z-index: 2;
+  width: 85%;
+  height: auto;
+  margin-bottom: 20px;
+  margin-left: 20px;
+  object-fit: contain;
+  align-self: flex-end;
+}
+
+.formSide {
+  flex: 1;
+  background: linear-gradient(-90deg, #ffffff 0%, #dac1ed 77%, #c198e0 100%);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  position: relative;
+  direction: rtl;
+  text-align: right;
+}
+
+.bigInText {
+  position: absolute;
+  top: 3%;
+  right: 400px;
+  font-size: 7rem;
+  font-weight: 900;
+  color: white;
+  line-height: 1;
+  z-index: 1;
+  font-family: "Arial", sans-serif;
+}
+
+.formContent {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+.inputGroup {
+  margin-bottom: 20px;
+}
+
+.inputGroup label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #4b5563;
+}
+
+.inputField {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 2px solid #e5e7eb;
+  background-color: white;
+  font-size: 1rem;
+  outline: none;
+  color: #374151;
+  transition: border-color 0.3s;
+}
+
+.inputField:focus {
+  border-color: #c198e0;
+}
+
+.inputField::placeholder {
+  color: #9ca3af;
+}
+
+.forgotPassword {
+  display: block;
+  font-size: 0.75rem;
+  color: #929292;
+  margin-top: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  text-align: right;
+}
+
+.loginButton {
+  width: 50%;
+  padding: 12px;
+  background: linear-gradient(135deg, #c198e0 0%, #a855f7 100%);
+  border: none;
+  color: white;
+  border-radius: 12px;
+  right: 20%;
+  margin-top: 25px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  text-align: center;
+}
+
+.loginButton:hover {
+  transform: translateY(-3px);
+}
+
+.loginButton:hover::before {
+  opacity: 1;
+}
+
+.loginButton:active {
+  transform: translateY(0);
+}
+
+.createAccountBtn {
+  display: inline-block;
+  background: white;
+  color: hsl(274, 54%, 74%);
+  padding: 6px 31px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  right: 35%;
+}
+
+.createAccountBtn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.createAccountBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.25);
+}
+
+.createAccountBtn:hover::before {
+  opacity: 1;
+}
+
+.createAccountBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.2);
+}
+
+.registerSection {
+  text-align: start;
+  padding-top: 20px;
+}
+
+.registerText {
+  color: #c198e0;
+  font-weight: bold;
+  margin-bottom: 15px;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.contentWrapper {
+  display: none;
+}
+
+@media (max-width: 975px) {
+  .bigInText,
+  .bigLogText,
+  .illustrationImage {
+    display: none;
+  }
+  .formSide {
+    right: 25%;
+    border-radius: 24px;
+  }
+  .loginButton {
+    width: 95%;
+    right: 0%;
+  }
+  .contentWrapper {
+    display: block;
+    position: absolute;
+    z-index: 2;
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+    top: 6%;
+    left: 10%;
+  }
+  .welcomeText {
+    color: #a855f7;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    text-align: right;
+  }
+  .subText {
+    color: #6b7280;
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    text-align: right;
+    font-weight: 700;
+  }
+  .header {
+    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .bigInText,
+  .bigLogText,
+  .illustrationSide,
+  .illustrationImage {
+    display: none;
+  }
+
+  .card {
+    width: 100%;
+    height: auto;
+    min-height: 75vh;
+    border-radius: 0;
+    flex-direction: column;
+  }
+
+  .formSide {
+    width: 80%;
+    padding: 32px 20px;
+    border-radius: 0;
+    left: 10%;
+    border-radius: 24px;
+  }
+
+  .loginButton {
+    width: 50%;
+    right: 20%;
+    padding: 8px;
+  }
+
+  .contentWrapper {
+    display: none;
+  }
+
+  .createAccountBtn {
+    right: 0%;
+    padding: 4px 29px;
+  }
+
+  .registerText {
+    text-align: center;
+  }
+}

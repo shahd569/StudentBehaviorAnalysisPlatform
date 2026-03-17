@@ -9,7 +9,7 @@ export async function GET() {
     // if (!session || !session.user || session.user.role !== "TEACHER") {
     //   return NextResponse.json(
     //     { message: "غير مسموح لك بالوصول لهذه البيانات" },
-    //     { status: 401 }
+    //     { status: 401 },
     //   );
     // }
     // const teacherId = parseInt(session.user.id);
@@ -22,13 +22,17 @@ export async function GET() {
     let excellent = 0;
     let average = 0;
     let weake = 0;
-
+    const MAX_SCORE = 220;
     studentsData.forEach((student) => {
-      const totalScore =
-        student.academicScore + student.commitmentScore + student.activityScore;
-      if (totalScore >= 85) {
+      const academic = Number(student.academicScore || 0);
+      const commitment = Number(student.commitmentScore || 0);
+      const activity = Number(student.activityScore || 0);
+
+      const totalScore = academic + commitment + activity;
+      const percentage = (totalScore / MAX_SCORE) * 100;
+      if (percentage >= 85) {
         excellent++;
-      } else if (totalScore <= 65) {
+      } else if (percentage <= 65) {
         weake++;
       } else {
         average++;

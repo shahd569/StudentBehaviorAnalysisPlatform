@@ -10,7 +10,7 @@ export async function GET() {
     // if (!session || !session.user || session.user.role !== "TEACHER") {
     //   return NextResponse.json(
     //     { message: "غير مسموح لك بالوصول لهذه البيانات" },
-    //     { status: 401 }
+    //     { status: 401 },
     //   );
     // }
 

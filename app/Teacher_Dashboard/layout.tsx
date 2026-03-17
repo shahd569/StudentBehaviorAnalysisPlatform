@@ -10,13 +10,13 @@ export default function Teacher_DashboardLayout({
 }>) {
   return (
     <html lang="ar">
-      <div className="vh-100 d-flex bg-light">
+      <div className="vh-100 d-flex" style={{ backgroundColor: "#fafafae3" }}>
         {/* right */}
         <div
           className={`p-4 ${styles.gradientBackground} ${styles.sidebar}`}
-          style={{ width: "var(--sidebar-width)" }}
+          style={{ width: "14%" }}
         >
-          <div className="d-flex align-items-center justify-content-center gap-2 mb-4">
+          <div className="d-flex align-items-center justify-content-center gap-2 mb-5">
             <span
               className="d-none d-lg-block"
               style={{ color: "white", fontWeight: "bold", fontSize: "18px" }}
@@ -32,8 +32,13 @@ export default function Teacher_DashboardLayout({
         </div>
         {/* leftt */}
         <div
-          className="bg-light d-flex flex-column"
-          style={{ overflow: "scroll", flex: 1 }}
+          className="d-flex flex-column"
+          style={{
+            backgroundColor: "#fafafae3",
+            overflow: "scroll",
+            flex: 1,
+            width: "86%",
+          }}
         >
           <Navbar></Navbar>
           {children}

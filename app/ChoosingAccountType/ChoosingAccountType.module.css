@@ -1,0 +1,170 @@
+.container {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 60px;
+  padding-top: 160px;
+  background-image: url("/image/choosing-bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+.container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.5);
+  z-index: 0;
+}
+
+.container > * {
+  position: relative;
+  z-index: 1;
+}
+
+/*  CARD  */
+.card {
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.4s ease;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+}
+
+/*  IMAGE WRAPPER */
+.imageWrapper {
+  width: 350px;
+  height: 410px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  border-radius: 24px;
+  transition:
+    transform 0.5s ease,
+    box-shadow 0.5s ease;
+}
+
+/* Hover animation */
+.card:hover .imageWrapper {
+  transform: scale(1.05);
+  box-shadow: 0 30px 60px rgba(168, 85, 247, 0.45);
+}
+
+/* BACKGROUNDS */
+.teacherBg {
+  background: linear-gradient(45deg, #c198e0 0%, #ffffff 100%);
+}
+
+.studentBg {
+  background: linear-gradient(-45deg, #c198e0 0%, #ffffff 100%);
+}
+
+.characterImage {
+  width: none;
+  height: none;
+}
+
+/* LABEL */
+.label {
+  display: block;
+  margin-top: 20px;
+  font-size: 44px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #e31eb5;
+}
+
+/* ENTRY ANIMATION */
+.fadeSlide {
+  opacity: 0;
+  transform: translateY(40px);
+  animation: fadeSlideUp 0.9s ease-out forwards;
+}
+
+.fadeSlideDelay {
+  opacity: 0;
+  transform: translateY(40px);
+  animation: fadeSlideUp 0.9s ease-out forwards;
+  animation-delay: 0.25s;
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1024px) {
+  .container {
+    gap: 40px;
+    padding-top: 120px;
+  }
+
+  .imageWrapper {
+    width: 300px;
+    height: 360px;
+  }
+
+  .label {
+    font-size: 36px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    padding-top: 80px;
+    padding-bottom: 80px;
+    gap: 50px;
+  }
+
+  .imageWrapper {
+    width: 260px;
+    height: 320px;
+    align-items: center;
+  }
+
+  .label {
+    font-size: 28px;
+    margin-top: 16px;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+
+  .card:hover .imageWrapper {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .characterImage {
+    transform: scale(0.61);
+  }
+}
+
+@media (max-width: 480px) {
+  .imageWrapper {
+    width: 220px;
+    height: 280px;
+    align-items: center;
+  }
+
+  .label {
+    font-size: 24px;
+    letter-spacing: 1px;
+  }
+}

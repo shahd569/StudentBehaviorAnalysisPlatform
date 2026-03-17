@@ -10,7 +10,7 @@ export async function GET() {
     // if (!session || !session.user || session.user.role !== "TEACHER") {
     //   return NextResponse.json(
     //     { message: "غير مسموح لك بالوصول لهذه البيانات" },
-    //     { status: 401 }
+    //     { status: 401 },
     //   );
     // }
 
@@ -31,13 +31,21 @@ export async function GET() {
       }),
     ]);
 
-    const excellentStudents = students.filter(
-      (s) => s.academicScore + s.commitmentScore + s.activityScore >= 85,
-    ).length;
+    const MAX_SCORE = 220;
 
-    const weakStudents = students.filter(
-      (s) => s.academicScore + s.commitmentScore + s.activityScore <= 65,
-    ).length;
+    const excellentStudents = students.filter((s) => {
+      const total =
+        s.academicScore + s.commitmentScore + Number(s.activityScore || 0);
+      const percentage = (total / MAX_SCORE) * 100;
+      return percentage >= 85;
+    }).length;
+
+    const weakStudents = students.filter((s) => {
+      const total =
+        s.academicScore + s.commitmentScore + Number(s.activityScore || 0);
+      const percentage = (total / MAX_SCORE) * 100;
+      return percentage <= 65;
+    }).length;
 
     return NextResponse.json({
       totalStudents,

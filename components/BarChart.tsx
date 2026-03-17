@@ -26,7 +26,7 @@ const AttendanceChart = () => {
   if (isLoading) {
     return (
       <div
-        style={{ minHeight: "200px" }}
+        style={{ minHeight: "300px" }}
         className="card border-0 shadow-sm p-4 d-flex align-items-center justify-content-center"
       >
         <p>جاري تحميل البيانات...</p>
@@ -39,7 +39,7 @@ const AttendanceChart = () => {
   if (error || !Array.isArray(chartData) || chartData.length === 0) {
     return (
       <div
-        style={{ minHeight: "200px" }}
+        style={{ minHeight: "300px" }}
         className="card border-0 shadow-sm p-4 d-flex align-items-center justify-content-center"
       >
         <p className="text-muted">لا توجد بيانات نشاط لهذا الأسبوع</p>
@@ -49,8 +49,8 @@ const AttendanceChart = () => {
 
   return (
     <div
-      className="card border-0 shadow-sm p-4 h-100"
-      style={{ minHeight: "200px" }}
+      className="card border-0 shadow-sm p-4 h-100 rounded-4"
+      style={{ minHeight: "300px" }}
     >
       <h6 className="fw-bold mb-4 text-end" style={{ color: "#374151" }}>
         نشاط الطلاب خلال الأسبوع
@@ -65,24 +65,33 @@ const AttendanceChart = () => {
           <XAxis
             dataKey="name"
             axisLine={false}
-            tick={{ fill: "#6b7280", fontSize: 13 }}
+            tick={{ fill: "dId5db" }}
             tickLine={false}
           />
           <YAxis
             axisLine={false}
-            tick={{ fill: "#6b7280" }}
+            tick={{ fill: "dId5db" }}
             tickLine={false}
             allowDecimals={false}
             domain={[0, "dataMax + 1"]}
           />
-          <Tooltip cursor={{ fill: "#f9fafb" }} />
+          <Tooltip
+            contentStyle={{ borderRadius: "10px", borderColor: "lightgray" }}
+          />
+          <Legend
+            align="left"
+            verticalAlign="top"
+            wrapperStyle={{ paddingBottom: "10px" }}
+          />
           <Bar
             dataKey="students"
-            fill="#a855f7"
+            fill="#f1c3faff"
             radius={[10, 10, 0, 0]}
+            style={{ paddingBottom: "5px" }}
             name="عدد الطلاب"
-            isAnimationActive={false}
-            minPointSize={3}
+            // isAnimationActive={false}
+            // minPointSize={3}
+            legendType="circle"
           />
         </BarChart>
       </ResponsiveContainer>

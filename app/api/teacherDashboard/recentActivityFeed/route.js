@@ -5,18 +5,18 @@ import { getServerSession } from "next-auth";
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    // const session = await getServerSession(authOptions);
 
-    if (!session || !session.user || session.user.role !== "TEACHER") {
-      return NextResponse.json(
-        { message: "غير مسموح لك بالوصول لهذه البيانات" },
-        { status: 401 },
-      );
-    }
+    // if (!session || !session.user || session.user.role !== "TEACHER") {
+    //   return NextResponse.json(
+    //     { message: "غير مسموح لك بالوصول لهذه البيانات" },
+    //     { status: 401 },
+    //   );
+    // }
 
-    const teacherId = parseInt(session.user.id);
+    // const teacherId = parseInt(session.user.id);
 
-    // const teacherId = 17;
+    const teacherId = 17;
 
     const recentAssignment = await prisma.AssignmentSubmission.findMany({
       take: 5,

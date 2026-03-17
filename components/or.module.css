@@ -1,0 +1,38 @@
+.orWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.orImage {
+  max-width: 220px;
+  height: auto;
+}
+
+@media (max-width: 1024px) {
+  .orImage {
+    max-width: 160px;
+  }
+}
+
+@media (max-width: 768px) {
+  .orWrapper {
+    position: relative;
+    width: 100%;
+  }
+
+  .orImage {
+    display: none;
+  }
+
+  .orWrapper::before {
+    content: "OR";
+    font-size: 20px;
+    font-weight: 900;
+    color: #e31eb5;
+    background: white;
+    padding: 6px 16px;
+    border-radius: 999px;
+  }
+}
