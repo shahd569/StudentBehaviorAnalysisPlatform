@@ -5,12 +5,12 @@ import { authOptions } from "@/lib/auth"; // تأكدي من صحة المسار
 
 export async function GET() {
   try {
-    // const session = await getServerSession(authOptions);
-    // if (!session || !session.user || session.user.role !== "TEACHER") {
-    //   return NextResponse.json({ message: "غير مسموح" }, { status: 401 });
-    // }
-    // const teacherId = parseInt(session.user.id);
-    const teacherId = 17;
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user || session.user.role !== "TEACHER") {
+      return NextResponse.json({ message: "غير مسموح" }, { status: 401 });
+    }
+    const teacherId = parseInt(session.user.id);
+    // const teacherId = 17;
 
     const dateLimit = new Date();
     dateLimit.setDate(dateLimit.getDate() - 7);
