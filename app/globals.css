@@ -41,3 +41,11 @@ body {
   direction: rtl;
   max-width: 100%;
 }
+
+.modal-content {
+  background: linear-gradient(to bottom, #f5d7f4, #e7ddf3, #f2f2f2);
+}
+
+.modal-header {
+  border: none;
+}

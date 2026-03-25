@@ -6,6 +6,8 @@ import UserCard from "@/components/userCard";
 import BarChart from "@/components/BarChart";
 import Chart from "@/components/pieChart";
 import LastActivity from "@/components/LastActive";
+import AnnouncementsModal from "@/components/Announcement";
+import TestModal from "@/components/testModal";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -70,6 +72,10 @@ export default function TeacherDashboard() {
           >
             <BarChart />
           </div>
+        </div>
+        <div>
+          <AnnouncementsModal></AnnouncementsModal>
+          <TestModal></TestModal>
         </div>
       </div>
       <div className="flex flex-col gap-8 col-md-3">

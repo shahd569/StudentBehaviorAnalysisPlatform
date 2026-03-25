@@ -9,41 +9,39 @@ export default function Teacher_DashboardLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ar">
-      <div className="vh-100 d-flex" style={{ backgroundColor: "#fafafae3" }}>
-        {/* right */}
-        <div
-          className={`p-4 ${styles.gradientBackground} ${styles.sidebar}`}
-          style={{ width: "14%" }}
-        >
-          <div className="d-flex align-items-center justify-content-center gap-2 mb-5">
-            <span
-              className="d-none d-lg-block"
-              style={{ color: "white", fontWeight: "bold", fontSize: "18px" }}
-            >
-              E-Learning
-            </span>
-            <FontAwesomeIcon
-              style={{ color: "white", fontSize: "36px" }}
-              icon={faGraduationCap}
-            ></FontAwesomeIcon>
-          </div>
-          <Menue></Menue>
+    <div className="vh-100 d-flex" style={{ backgroundColor: "#fafafae3" }}>
+      {/* right */}
+      <div
+        className={`p-4 ${styles.gradientBackground} ${styles.sidebar}`}
+        style={{ width: "14%" }}
+      >
+        <div className="d-flex align-items-center justify-content-center gap-2 mb-5">
+          <span
+            className="d-none d-lg-block"
+            style={{ color: "white", fontWeight: "bold", fontSize: "18px" }}
+          >
+            E-Learning
+          </span>
+          <FontAwesomeIcon
+            style={{ color: "white", fontSize: "36px" }}
+            icon={faGraduationCap}
+          ></FontAwesomeIcon>
         </div>
-        {/* leftt */}
-        <div
-          className="d-flex flex-column"
-          style={{
-            backgroundColor: "#fafafae3",
-            overflow: "scroll",
-            flex: 1,
-            width: "86%",
-          }}
-        >
-          <Navbar></Navbar>
-          {children}
-        </div>
+        <Menue></Menue>
       </div>
-    </html>
+      {/* leftt */}
+      <div
+        className="d-flex flex-column"
+        style={{
+          backgroundColor: "#fafafae3",
+          overflow: "scroll",
+          flex: 1,
+          width: "86%",
+        }}
+      >
+        <Navbar></Navbar>
+        {children}
+      </div>
+    </div>
   );
 }

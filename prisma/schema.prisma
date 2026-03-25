@@ -192,6 +192,7 @@ model AlertAndRecommendations {
   alertType     AlerType
   triggerReason TriggerReason
   content       String
+  title         String?
   createdAt     DateTime      @default(now())
   isRead        Boolean       @default(false)
   studentId     Int
@@ -279,10 +280,12 @@ enum AlerType {
   PERFORMANCE_ALERT
   RECOMMENDATION
   DUE_DATE_REMINDER
+  ANNOUNCEMENT
 }
 
 enum TriggerReason {
   LOW_QUIZ_SCORE
   LOW_ACTIVITY
   LATE_SUBMISSION
+  NEW_CONTENT
 }
