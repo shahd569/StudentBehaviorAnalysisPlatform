@@ -1,6 +1,6 @@
 tbody tr:nth-child(even) {
   background-color: #f5d7f4;
-  /* background-color: #f0c2ee; */
+  /* background-color: #9dc3fd; */
 }
 table tr:nth-child(odd) {
   background-color: white;

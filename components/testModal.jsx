@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useState, useEffect } from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
@@ -8,26 +8,30 @@ import Tab from "react-bootstrap/Tab";
 export default function TestModal() {
   const [show, setShow] = useState(false);
 
- 
   const [title, setTitle] = useState("");
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
-  const [subjectsList, setSubjectsList] = useState([]); 
+  const [subjectsList, setSubjectsList] = useState([]);
 
   const [duration, setDuration] = useState("");
   const [totalMarks, setTotalMarks] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
- 
+  const [questionText, setQuestionText] = useState("");
+  const [options, setOptions] = useState(["", "", "", ""]);
+  const [correctAnswer, setCorrectAnswer] = useState("");
+  const [marks, setMarks] = useState("");
+  const [questions, setQuestions] = useState("");
+
   useEffect(() => {
     if (!show) return;
 
     const fetchSubjects = async () => {
       try {
-        const res = await fetch("/api/teacherDshboard/subjects");
+        const res = await fetch("/api/teacherCourses");
         const data = await res.json();
-        if (res.ok) setSubjectsList(data.subjects);
+        if (res.ok) setSubjectsList(data);
       } catch (error) {
         console.error("خطأ في جلب المواد:", error);
       }
@@ -51,7 +55,6 @@ export default function TestModal() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "فشل إنشاء الاختبار");
       console.log("تم إرسال البيانات:", data);
-      
     } catch (error) {
       console.error("خطأ في إرسال البيانات:", error);
     }
@@ -70,18 +73,58 @@ export default function TestModal() {
         centered
       >
         <Modal.Header closeButton></Modal.Header>
-        <Modal.Body style={{ padding: '20px', height: "500px", overflow: "hidden" }}>
+        <Modal.Body
+          style={{ padding: "20px", height: "500px", overflow: "auto" }}
+        >
           <Tab.Container defaultActiveKey="first">
-            <Nav variant="tabs" style={{ display: "flex", justifyContent: "space-between", width: "100%", margin: "10px" }}>
-              <Nav.Item><Nav.Link style={{ color: "gray", fontSize: "18px" }} eventKey="first">معلومات الاختبار</Nav.Link></Nav.Item>
-              <Nav.Item><Nav.Link style={{ color: "gray", fontSize: "18px" }} eventKey="second">الإعدادات</Nav.Link></Nav.Item>
-              <Nav.Item><Nav.Link style={{ color: "gray", fontSize: "18px" }} eventKey="third">إضافة سؤال</Nav.Link></Nav.Item>
-              <Nav.Item><Nav.Link style={{ color: "gray", fontSize: "18px" }} eventKey="forth">نشر</Nav.Link></Nav.Item>
+            <Nav
+              variant="tabs"
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+                margin: "10px",
+              }}
+            >
+              <Nav.Item>
+                <Nav.Link
+                  style={{ color: "gray", fontSize: "18px" }}
+                  eventKey="first"
+                >
+                  معلومات الاختبار
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link
+                  style={{ color: "gray", fontSize: "18px" }}
+                  eventKey="second"
+                >
+                  الإعدادات
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link
+                  style={{ color: "gray", fontSize: "18px" }}
+                  eventKey="third"
+                >
+                  إضافة سؤال
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link
+                  style={{ color: "gray", fontSize: "18px" }}
+                  eventKey="forth"
+                >
+                  نشر
+                </Nav.Link>
+              </Nav.Item>
             </Nav>
 
             <Tab.Content>
               <Tab.Pane eventKey="first">
-                <p style={{ color: "black", fontSize: "20px", margin: "15px" }}>عنوان الاختبار :</p>
+                <p style={{ color: "black", fontSize: "20px", margin: "15px" }}>
+                  عنوان الاختبار :
+                </p>
                 <input
                   placeholder="أدخل عنوان الاختبار..."
                   value={title}
@@ -97,7 +140,9 @@ export default function TestModal() {
                   }}
                   type="text"
                 />
-                <p style={{ color: "black", fontSize: "20px", margin: "15px" }}>المادة :</p>
+                <p style={{ color: "black", fontSize: "20px", margin: "15px" }}>
+                  المادة :
+                </p>
                 <select
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
@@ -113,11 +158,15 @@ export default function TestModal() {
                 >
                   <option value="">اختر المادة</option>
                   {subjectsList.map((s) => (
-                    <option key={s.id} value={s.id}>{s.name}</option>
+                    <option key={s.id} value={s.id}>
+                      {s.courseName}
+                    </option>
                   ))}
                 </select>
 
-                <p style={{ color: "black", fontSize: "20px", margin: "15px" }}>الوصف (اختياري) :</p>
+                <p style={{ color: "black", fontSize: "20px", margin: "15px" }}>
+                  الوصف (اختياري) :
+                </p>
                 <textarea
                   rows={4}
                   placeholder="أدخل وصف المحتوى"
@@ -128,6 +177,7 @@ export default function TestModal() {
                     borderRadius: "30px",
                     border: "none",
                     width: "100%",
+                    height: "40px",
                     padding: "10px",
                     fontSize: "16px",
                     marginBottom: "40px",
@@ -151,108 +201,287 @@ export default function TestModal() {
                 </div>
               </Tab.Pane>
               <Tab.Pane eventKey="second">
-                <p style={{color:"black", fontSize:"20px", margin:"15px"}}> مدة الاختبار  (اختياري):</p>
+                <p style={{ color: "black", fontSize: "20px", margin: "15px" }}>
+                  {" "}
+                  مدة الاختبار (اختياري):
+                </p>
                 <input
-                   type="Number"
-                   value={duration}
-                   onChange={(e) => setDuration(e.target.value)}
-                   style={{
-                   backgroundColor: "white", 
-                   borderRadius: "30px", 
-                   border:"none",
-                   width: "100%", 
-                   height: "40px",
-                   padding:"10px",
-                  fontSize:"16px"
-                   }}
-                   placeholder="ادخل مدة الاختبار بالدقائق"
-                   />
-                  <p style={{color:"black", fontSize:"20px", margin:"15px"}}>الدرجة النهائية :</p>
-                <input
-                value={totalMarks}
-                onChange={(e) => setTotalMarks(e.target.value)}
-                style={{
-                    backgroundColor: "white", 
-                    borderRadius: "30px", 
-                    border:"none",
-                    width: "100%", 
+                  type="Number"
+                  value={duration}
+                  onChange={(e) => setDuration(e.target.value)}
+                  style={{
+                    backgroundColor: "white",
+                    borderRadius: "30px",
+                    border: "none",
+                    width: "100%",
                     height: "40px",
-                    padding:"10px",
-                    fontSize:"16px"
-                  }}></input>
-                  <div style={{display:"flex",justifyContent:"space-between", alignItems:"center", marginTop:"20px", marginBottom:"60px"}}>
-            
-            <div>
-              <label style={{color:"black", fontSize:"20px", margin:"15px"}}>تاريخ البدء :</label>
-              <input
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              style={{
-                  backgroundColor: "white", 
-                  borderRadius: "10px", 
-                  width:"200px",
-                  margin:"10px",
-                  border:"none",
-                  height: "40px",
-                  padding:"10px",
-                  fontSize:"16px",
-                }} type="date" />
-            </div>
-            <div>
-              <label style={{color:"black", fontSize:"20px", margin:"15px"}}>تاريخ البدء :</label>
-              <input
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              style={{
-                  backgroundColor: "white", 
-                  borderRadius: "10px", 
-                  width:"200px",
-                  margin:"10px",
-                  border:"none",
-                  height: "40px",
-                  padding:"10px",
-                  fontSize:"16px",
-                }} type="date" />
-            </div>
-          </div>
-          <div style={{display:"flex", justifyContent:"end"}}>
-                  <button style={{border:"1px solid black", width:"150px", height:"45px", textAlign:"center", fontSize:"18px", borderRadius:"5px"}}>التالي</button>
+                    padding: "10px",
+                    fontSize: "16px",
+                  }}
+                  placeholder="ادخل مدة الاختبار بالدقائق"
+                />
+                <p style={{ color: "black", fontSize: "20px", margin: "15px" }}>
+                  الدرجة النهائية :
+                </p>
+                <input
+                  value={totalMarks}
+                  onChange={(e) => setTotalMarks(e.target.value)}
+                  style={{
+                    backgroundColor: "white",
+                    borderRadius: "30px",
+                    border: "none",
+                    width: "100%",
+                    height: "40px",
+                    padding: "10px",
+                    fontSize: "16px",
+                  }}
+                ></input>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginTop: "20px",
+                    marginBottom: "60px",
+                  }}
+                >
+                  <div>
+                    <label
+                      style={{
+                        color: "black",
+                        fontSize: "20px",
+                        margin: "15px",
+                      }}
+                    >
+                      تاريخ البدء :
+                    </label>
+                    <input
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      style={{
+                        backgroundColor: "white",
+                        borderRadius: "10px",
+                        width: "200px",
+                        margin: "10px",
+                        border: "none",
+                        height: "40px",
+                        padding: "10px",
+                        fontSize: "16px",
+                      }}
+                      type="date"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      style={{
+                        color: "black",
+                        fontSize: "20px",
+                        margin: "15px",
+                      }}
+                    >
+                      تاريخ الانتهاء :
+                    </label>
+                    <input
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      style={{
+                        backgroundColor: "white",
+                        borderRadius: "10px",
+                        width: "200px",
+                        margin: "10px",
+                        border: "none",
+                        height: "40px",
+                        padding: "10px",
+                        fontSize: "16px",
+                      }}
+                      type="date"
+                    />
+                  </div>
+                </div>
+                <div style={{ display: "flex", justifyContent: "end" }}>
+                  <button
+                    style={{
+                      border: "1px solid black",
+                      width: "150px",
+                      height: "45px",
+                      textAlign: "center",
+                      fontSize: "18px",
+                      borderRadius: "5px",
+                    }}
+                  >
+                    التالي
+                  </button>
                 </div>
               </Tab.Pane>
               <Tab.Pane eventKey="third">
-                <p style={{color:"black", fontSize:"20px", margin:"15px"}}>الوصف : </p>
-                <textarea
-                  rows={4}
-                  placeholder="أدخل وصف المحتوى"
-                  style={{
-                    backgroundColor: "white", 
-                    borderRadius: "30px", 
-                    border:"none",
-                    width: "100%", 
-                    height: "40px",
-                    padding:"15px",
-                    fontSize:"16px"
-                  }} 
-                  type="text" 
-                />
-                <div style={{display:"flex", flexDirection:"column", paddingRight:"10px", margin:"20px"}}>
-                        <label style={{fontSize:"18px"}}><input  type="radio" name="option" value="option1"/> إرسال إشعار للطلاب عند النشر</label>
-                     </div>
-                      <p style={{color:"black", fontSize:"20px", margin:"30px 15px"}}>آخر موعد للتسليم :</p> 
-                      <input 
+                <div style={{ display: "flex", gap: "25px" }}>
+                  <div style={{ flex: "2", flexGrow: "2" }}>
+                    <textarea
+                      value={questionText}
+                      onChange={(e) => setQuestionText(e.target.value)}
+                      rows={4}
+                      placeholder="أكتب السؤال هنا ..."
                       style={{
-                    backgroundColor: "white", 
-                    borderRadius: "30px", 
-                    border:"none",
-                    width: "100%", 
-                    height: "40px",
-                    padding:"15px",
-                    fontSize:"16px"
-                  }} type="date" ></input>
-                  <div style={{display:"flex", justifyContent:"space-between",marginTop:"70px"}}>
+                        backgroundColor: "white",
+                        borderRadius: "30px",
+                        border: "none",
+                        width: "95%",
+                        height: "40px",
+                        padding: "15px",
+                        fontSize: "16px",
+                      }}
+                      type="text"
+                    />
+                    {options.map((opt, index) => (
+                      <div key={index}>
+                        <label
+                          style={{
+                            color: "black",
+                            fontSize: "16px",
+                            margin: "10px 5px",
+                          }}
+                        >
+                          الخيار {index + 1}
+                        </label>
+                        <input
+                          value={opt}
+                          onChange={(e) => {
+                            const newOptions = [...options];
+                            newOptions[index] = e.target.value;
+                            setOptions(newOptions);
+                          }}
+                          style={{
+                            backgroundColor: "white",
+                            borderRadius: "15px",
+                            border: "1px solid #ccc",
+                            width: "84%",
+                            height: "30px",
+                          }}
+                        />
+                      </div>
+                    ))}
+                    <p
+                      style={{
+                        color: "black",
+                        fontSize: "20px",
+                        marginTop: "20px",
+                      }}
+                    >
+                      أختيار الإجابة الصحيحة :
+                    </p>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "20px",
+                        marginBottom: "20px",
+                      }}
+                    >
+                      {options.map((opt, index) => (
+                        <label key={index} style={{ fontSize: "18px" }}>
+                          <input
+                            type="radio"
+                            name="correct"
+                            value={index}
+                            onChange={(e) => setCorrectAnswer(e.target.value)}
+                          />
+                          الخيار {index + 1}
+                        </label>
+                      ))}
+                    </div>
+                    <label
+                      style={{
+                        color: "black",
+                        fontSize: "20px",
+                        margin: "5px",
+                      }}
+                    >
+                      درجة السؤال :
+                    </label>
+                    <input
+                      value={marks}
+                      onChange={(e) => setMarks(e.target.value)}
+                      style={{
+                        backgroundColor: "white",
+                        borderRadius: "15px",
+                        border: "1px solid #ccc",
+                        width: "70%",
+                        height: "30px",
+                      }}
+                    ></input>
+
+                    <button
+                      style={{
+                        backgroundColor: "#a855f7",
+                        color: "white",
+                        border: "none",
+                        padding: "10px 20px",
+                        borderRadius: "20px",
+                        cursor: "pointer",
+                        width: "85%",
+                        textAlign: "center",
+                        marginTop: "15px",
+                      }}
+                      onClick={() => {
+                        if (!questionText || !marks || correctAnswer === "") {
+                          alert("يرجى تعبئة جميع الحقول");
+                          return;
+                        }
+
+                        const newQuestion = {
+                          question: questionText,
+                          options,
+                          correctAnswer,
+                          marks,
+                        };
+
+                        setQuestions([...questions, newQuestion]);
+
+                        setQuestionText("");
+                        setOptions(["", "", "", ""]);
+                        setCorrectAnswer("");
+                        setMarks("");
+                      }}
+                    >
+                      ➕ إضافة السؤال
+                    </button>
+                  </div>
+                  <div
+                    style={{
+                      flexGrow: "1",
+                      flex: "1",
+                      border: "1px solid #ccc",
+                      padding: "10px 20px",
+                    }}
+                  >
+                    <h5>أسئلة الاختبار</h5>
+                    <div
+                      style={{
+                        backgroundColor: "white",
+                        padding: "5px",
+                        borderRadius: "10px",
+                      }}
+                    >
+                      <p>ماهو html</p>
+                      <p>الإجابة الصحيحة</p>
+                    </div>
+                    <div
+                      style={{
+                        backgroundColor: "white",
+                        padding: "5px",
+                        borderRadius: "10px",
+                        marginTop: "10px",
+                      }}
+                    >
+                      <p>ماهو html</p>
+                      <p>الإجابة الصحيحة</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* <div style={{display:"flex", justifyContent:"space-between",marginTop:"20px"}}>
                   <button style={{border:"1px solid black", width:"150px", height:"45px", textAlign:"center", fontSize:"18px", borderRadius:"5px"}}>السابق</button>
                   <button style={{border:"1px solid black", width:"150px", height:"45px", textAlign:"center", fontSize:"18px", borderRadius:"5px"}}>التالي</button>
-                </div>
+                </div> */}
               </Tab.Pane>
             </Tab.Content>
           </Tab.Container>

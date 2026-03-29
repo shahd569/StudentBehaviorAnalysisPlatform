@@ -30,7 +30,7 @@ export const links = [
     id: 3,
     icon: faClipboardList,
     title: "الاختبارات",
-    url: "/orphans",
+    url: "/Teacher_Dashboard/quiz",
   },
   {
     id: 4,

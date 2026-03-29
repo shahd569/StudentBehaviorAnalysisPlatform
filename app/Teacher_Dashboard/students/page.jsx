@@ -98,7 +98,7 @@ export default function StudentsTable() {
         fontSize: "18px",
       }}
     >
-      <h1 style={{ fontWeight: "bold", color: "gray" }}>الطلاب</h1>
+      <h1 style={{ fontWeight: "bold", color: "black" }}>الطلاب</h1>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <p style={{ fontSize: "18px", fontWeight: "bold", color: "gray" }}>
           متابعة أداء الطلاب في جميع المواد
