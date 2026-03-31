@@ -19,6 +19,7 @@ export async function GET(req, { params }) {
       recentQuizzes,
       performanceInfo,
       recentAttempts,
+      performanceHistory,
     ] = await Promise.all([
       prisma.Users.findUnique({
         where: { id: studentId },
@@ -93,6 +94,20 @@ export async function GET(req, { params }) {
         where: { studentId: studentId },
         orderBy: { startTime: "desc" },
         take: 2,
+      }),
+      prisma.QuizAttempt.findMany({
+        where: { studentId: studentId },
+        orderBy: { startTime: "asc" }, // من الاقدم للاحدث
+        take: 5,
+        select: {
+          score: true,
+          startTime: true,
+          quiz: {
+            select: {
+              title: true,
+            },
+          },
+        },
       }),
     ]);
 
@@ -295,6 +310,12 @@ export async function GET(req, { params }) {
       }
     }
 
+    // المخطط
+    const charData = performanceHistory.map((attempt) => ({
+      name: attempt.quiz?.title || "اختبار",
+      score: attempt.score,
+    }));
+
     return NextResponse.json(
       {
         personalInfo: {
@@ -318,6 +339,7 @@ export async function GET(req, { params }) {
           performanceStatus,
           percentageScore,
           trend,
+          charData,
         },
       },
       { status: 200 },
