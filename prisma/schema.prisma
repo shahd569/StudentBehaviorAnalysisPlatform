@@ -74,7 +74,7 @@ model Lesson {
 model Video {
   id           Int                @id @default(autoincrement())
   url          String
-  duration     Int
+  duration     Int //ثانية
   lessonId     Int
   lesson       Lesson             @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   interactions VideoInteraction[]
@@ -158,12 +158,12 @@ model QuizAttempt {
 
 model VideoInteraction {
   id                 Int                    @id @default(autoincrement())
-  timestamp          DateTime               @default(now())
+  timestamp          DateTime               @default(now())  // متى وقع التفاعل (التاريخ والوقت)
   studentId          Int
   videoId            Int
   interactionType    TypeOfVideoInteraction
-  currentTimeSeconds Int
-  value              Float?
+  currentTimeSeconds Int // في اي ثانية من الفيديو كان يشاهد عندما وقع التفاعل
+  value              Float? // اذا كان التفاعل تغيير السرعة فهو يخزن القيمة مثل 1.5
   student            Users                  @relation(fields: [studentId], references: [id], onDelete: Cascade)
   video              Video                  @relation(fields: [videoId], references: [id], onDelete: Cascade)
 }

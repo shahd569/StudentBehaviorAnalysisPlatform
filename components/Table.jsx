@@ -3,6 +3,7 @@
 import Style from "@/components/table.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
+import Link from "next/link";
 
 const Table = ({ data }) => {
   if (!data) return <p>لا توجد بيانات للعرض</p>;
@@ -89,14 +90,16 @@ const Table = ({ data }) => {
             </td>
 
             <td style={{ padding: "10px", borderRadius: "10px 0 0 10px" }}>
-              <span>
-                <FontAwesomeIcon
-                  icon={faEye}
-                  style={{
-                    color: "gray",
-                  }}
-                ></FontAwesomeIcon>
-              </span>
+              <Link
+                href={`/Teacher_Dashboard/students/${item.id}/studentDetails`}
+              >
+                <button aria-label="عرض الطالب">
+                  <FontAwesomeIcon
+                    icon={faEye}
+                    style={{ color: "gray" }}
+                  ></FontAwesomeIcon>
+                </button>
+              </Link>
             </td>
           </tr>
         ))}
