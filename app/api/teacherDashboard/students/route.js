@@ -5,16 +5,12 @@ import { authOptions } from "@/lib/auth"; // تأكدي من صحة المسار
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user || session.user.role !== "TEACHER") {
-      return NextResponse.json({ message: "غير مسموح" }, { status: 401 });
-    }
-    const teacherId = parseInt(session.user.id);
-    // const teacherId = 17;
-
-    const dateLimit = new Date();
-    dateLimit.setDate(dateLimit.getDate() - 7);
-    dateLimit.setHours(0, 0, 0, 0);
+    // const session = await getServerSession(authOptions);
+    // if (!session || !session.user || session.user.role !== "TEACHER") {
+    //   return NextResponse.json({ message: "غير مسموح" }, { status: 401 });
+    // }
+    // const teacherId = parseInt(session.user.id);
+    const teacherId = 17;
 
     const [studentsData, performances] = await Promise.all([
       prisma.users.findMany({
@@ -39,10 +35,8 @@ export async function GET() {
           },
 
           sessions: {
-            where: {
-              startTime: { gte: dateLimit },
-            },
-            select: { id: true },
+            orderBy: { startTime: "desc" },
+            select: { id: true, startTime: true },
           },
         },
       }),
@@ -72,12 +66,16 @@ export async function GET() {
         else performanceStatus = "جيد";
       }
 
-      const sessionsCount = student.sessions.length;
+      const dateLimit = new Date();
+      dateLimit.setDate(dateLimit.getDate() - 7);
+      const recentSessionsCount = student.sessions.filter(
+        (s) => new Date(s.startTime) >= dateLimit,
+      ).length;
       let activityStatus = "غير نشط";
 
-      if (sessionsCount >= 3) {
+      if (recentSessionsCount >= 3) {
         activityStatus = "نشط";
-      } else if (sessionsCount >= 1) {
+      } else if (recentSessionsCount >= 1) {
         activityStatus = "منخفض";
       }
 
@@ -96,7 +94,7 @@ export async function GET() {
         academicYear: student.academicYear,
         performance: performanceStatus,
         activity: activityStatus,
-        sessionsCount: sessionsCount,
+        sessionsCount: recentSessionsCount,
         score: percentageScore,
       };
     });

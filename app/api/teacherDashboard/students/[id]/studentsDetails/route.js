@@ -306,7 +306,7 @@ export async function GET(req, { params }) {
       } else if (difference < -5) {
         trend = "في انخفاض 📉"; // تراجع ملحوظ
       } else {
-        trend = "مستقر"; // الفرق بسيط
+        trend = "مستقر 📊"; // الفرق بسيط
       }
     }
 
@@ -331,6 +331,7 @@ export async function GET(req, { params }) {
           avgSessionTime: avgSessionTime,
           activeDays: activeDaysCount,
           activityStatus: activityStatus,
+          recentSessionsCount: recentSessionsCount,
         },
         contentInteraction: formattedInteractions,
         weeklyChart: chartData,
