@@ -19,7 +19,9 @@ export async function GET(req, { params }) {
       recentQuizzes,
       performanceInfo,
       recentAttempts,
-      performanceHistory,
+      allAttempts,
+      assignments,
+      quizzes,
     ] = await Promise.all([
       prisma.Users.findUnique({
         where: { id: studentId },
@@ -97,14 +99,48 @@ export async function GET(req, { params }) {
       }),
       prisma.QuizAttempt.findMany({
         where: { studentId: studentId },
-        orderBy: { startTime: "asc" }, // من الاقدم للاحدث
-        take: 5,
         select: {
           score: true,
           startTime: true,
+        },
+        orderBy: { startTime: "asc" },
+      }),
+      prisma.AssignmentSubmission.findMany({
+        where: { studentId: studentId },
+        include: {
+          assignment: {
+            select: {
+              title: true,
+              lesson: {
+                select: {
+                  course: {
+                    select: {
+                      courseName: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      }),
+      prisma.QuizAttempt.findMany({
+        where: {
+          studentId: studentId,
+        },
+        include: {
           quiz: {
             select: {
               title: true,
+              lesson: {
+                select: {
+                  course: {
+                    select: {
+                      courseName: true,
+                    },
+                  },
+                },
+              },
             },
           },
         },
@@ -136,7 +172,7 @@ export async function GET(req, { params }) {
 
     const finalFeed = combinedActivity
       .sort((a, b) => new Date(b.time) - new Date(a.time))
-      .slice(0, 5);
+      .slice(0, 6);
 
     // حساب عدد مرات تسجيل الدخول
     const loginCount = studentData.sessions.length;
@@ -310,11 +346,71 @@ export async function GET(req, { params }) {
       }
     }
 
-    // المخطط
-    const charData = performanceHistory.map((attempt) => ({
-      name: attempt.quiz?.title || "اختبار",
-      score: attempt.score,
-    }));
+    // مخطط الاداء
+    // معالجة البيانات لتجميعها حسب الشهر
+    const monthlyDataMap = allAttempts.reduce((acc, attempt) => {
+      const date = new Date(attempt.startTime);
+      // إنشاء مفتاح يمثل الشهر والسنة (مثلاً: "2026-04")
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+
+      if (!acc[monthKey]) {
+        acc[monthKey] = { totalScore: 0, count: 0 };
+      }
+
+      acc[monthKey].totalScore += attempt.score;
+      acc[monthKey].count += 1;
+
+      return acc;
+    }, {});
+
+    //  تحويل الكائن إلى مصفوفة جاهزة للمخطط
+    const monthsNames = [
+      "يناير",
+      "فبراير",
+      "مارس",
+      "أبريل",
+      "مايو",
+      "يونيو",
+      "يوليو",
+      "أغسطس",
+      "سبتمبر",
+      "أكتوبر",
+      "نوفمبر",
+      "ديسمبر",
+    ];
+
+    const charData = Object.keys(monthlyDataMap).map((key) => {
+      const [year, month] = key.split("-");
+      const avg = Math.round(
+        monthlyDataMap[key].totalScore / monthlyDataMap[key].count,
+      );
+
+      return {
+        month: `${monthsNames[parseInt(month) - 1]}`,
+        average: avg,
+      };
+    });
+
+    //Assignments
+    const formattedAssignments = assignments.map((a) => {
+      return {
+        title: a.assignment.title,
+        courseName: a.assignment.lesson.course.courseName,
+        date: a.submittedAt,
+        status: a.status === "SUBMITTED" ? "تم التسليم ⏰" : "تم التصحيح ✅",
+        score: a.finalScore ?? "غير محدد",
+      };
+    });
+
+    //Quizzes
+    const formattedQuizzes = quizzes.map((q) => {
+      return {
+        title: q.quiz.title,
+        courseName: q.quiz.lesson.course.courseName,
+        date: q.startTime,
+        score: q.score,
+      };
+    });
 
     return NextResponse.json(
       {
@@ -342,6 +438,8 @@ export async function GET(req, { params }) {
           trend,
           charData,
         },
+        formattedAssignments,
+        formattedQuizzes,
       },
       { status: 200 },
     );

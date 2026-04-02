@@ -63,7 +63,7 @@ export async function GET() {
 
         if (percentageScore >= 85) performanceStatus = "ممتاز";
         else if (percentageScore <= 65) performanceStatus = "ضعيف";
-        else performanceStatus = "جيد";
+        else performanceStatus = " جــيــد";
       }
 
       const dateLimit = new Date();

@@ -10,7 +10,7 @@ const Performance = ({ data }) => {
           border: "1px solid #ccc",
           borderRadius: "10px",
           padding: "15px",
-          width: "400px",
+          width: "350px",
           display: "flex",
         }}
       >
@@ -26,7 +26,7 @@ const Performance = ({ data }) => {
           }}
         >
           {" "}
-          {data.performanceStatus} 
+          {data.performanceStatus}
         </p>
       </div>
       <div
@@ -34,13 +34,13 @@ const Performance = ({ data }) => {
           border: "1px solid #ccc",
           borderRadius: "10px",
           padding: "15px",
-          width: "400px",
+          width: "350px",
           display: "flex",
           alignItems: "center",
         }}
       >
         <p style={{ color: "#5f5f5f", fontWeight: "bold", fontSize: "18px" }}>
-           المعدل العام :
+          المعدل العام :
         </p>
         <p
           style={{
@@ -58,7 +58,7 @@ const Performance = ({ data }) => {
           border: "1px solid #ccc",
           borderRadius: "10px",
           padding: "15px",
-          width: "400px",
+          width: "350px",
           display: "flex",
           alignItems: "center",
         }}

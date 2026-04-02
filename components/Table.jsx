@@ -62,7 +62,7 @@ const Table = ({ data }) => {
                     ? "#21d40a"
                     : item.performance === "ضعيف"
                       ? "#fc3333ff"
-                      : "#626262",
+                      : "rgb(252, 177, 38)",
               }}
             >
               {" "}

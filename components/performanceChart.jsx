@@ -10,30 +10,29 @@ import {
 } from "recharts";
 import { RechartsDevtools } from "@recharts/devtools";
 
-const ActivityChart = ({ data }) => {
+const PerformanceChart = ({ data }) => {
   if (!data) return <p>لا توجد بيانات</p>;
 
   return (
     <div style={{ width: "600px", marginTop: "-40px" }}>
-      <h4 style={{ textAlign: "center" }}>تحليل نشاط الطالب </h4>
+      <h4 style={{ textAlign: "center" }}>تحليل أداء الطالب شهرياً</h4>
       <LineChart
         style={{
           width: "100%",
-          maxWidth: "700px",
+          maxWidth: "600px",
           maxHeight: "70vh",
           aspectRatio: 1.618,
-          width: "500px",
         }}
         responsive
-        data={data}
+        data={data.charData}
       >
         <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
-        <XAxis dataKey="day" padding={{ left: 30, right: 30 }} stroke="gray" />
-        <YAxis
-          width="auto"
+        <XAxis
+          dataKey="month"
+          padding={{ left: 30, right: 30 }}
           stroke="gray"
-          tickFormatter={(value) => Math.floor(value)}
         />
+        <YAxis width="auto" stroke="gray" />
         <Tooltip
           cursor={{ stroke: "var(--color-border-2)" }}
           contentStyle={{
@@ -44,8 +43,8 @@ const ActivityChart = ({ data }) => {
         <Legend />
         <Line
           type="monotone"
-          dataKey="count"
-          stroke="#0fce28"
+          dataKey="average"
+          stroke="#d23bf8"
           strokeWidth={6}
           dot={{
             fill: "var(--color-surface-base)",
@@ -57,4 +56,4 @@ const ActivityChart = ({ data }) => {
     </div>
   );
 };
-export default ActivityChart;
+export default PerformanceChart;

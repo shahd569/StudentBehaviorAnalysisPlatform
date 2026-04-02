@@ -10,7 +10,7 @@ const StudentDetails = ({ data }) => {
           border: "1px solid #ccc",
           borderRadius: "10px",
           padding: "15px",
-          width: "400px",
+          width: "350px",
           display: "flex",
         }}
       >
@@ -34,7 +34,7 @@ const StudentDetails = ({ data }) => {
           border: "1px solid #ccc",
           borderRadius: "10px",
           padding: "15px",
-          width: "400px",
+          width: "350px",
           display: "flex",
           alignItems: "center",
         }}
@@ -58,7 +58,7 @@ const StudentDetails = ({ data }) => {
           border: "1px solid #ccc",
           borderRadius: "10px",
           padding: "15px",
-          width: "400px",
+          width: "350px",
           display: "flex",
           alignItems: "center",
         }}
@@ -82,7 +82,7 @@ const StudentDetails = ({ data }) => {
           border: "1px solid #ccc",
           borderRadius: "10px",
           padding: "15px",
-          width: "400px",
+          width: "350px",
           display: "flex",
           alignItems: "center",
         }}

@@ -9,6 +9,9 @@ import ActivityTable from "@/components/activityTable";
 import LastActive from "@/components/studentLastActive";
 import Performance from "@/components/Performance";
 import ActivityChart from "@/components/activity";
+import PerformanceChart from "@/components/performanceChart";
+import AssignmentsTable from "@/components/StudentAssignments";
+import QuizzesTable from "@/components/StudentQuizzes";
 
 const StudentDetails = ({ params }) => {
   const { id } = use(params);
@@ -48,7 +51,7 @@ const StudentDetails = ({ params }) => {
   return (
     <div style={{ display: "flex", paddingLeft: "18px" }}>
       <div className="p-4 d-flex gap-5 flex-column col-md-9">
-        <div className="p-4 d-flex gap-5  col-md-9">
+        <div className="p-4 d-flex gap-5">
           <div
             className="rounded-circle d-flex align-items-center justify-content-center"
             style={{
@@ -97,7 +100,7 @@ const StudentDetails = ({ params }) => {
             </p>
           </div>
         </div>
-        <div className="p-4 d-flex gap-5 flex-column col-md-9">
+        <div className="p-4 d-flex gap-5 flex-column">
           <Tab.Container
             style={{ height: "100%", overflowY: "auto" }}
             defaultActiveKey="first"
@@ -146,20 +149,29 @@ const StudentDetails = ({ params }) => {
 
             <Tab.Content>
               <Tab.Pane eventKey="first">
-                <div style={{ margin: "30px 0px" }}>
+                <div
+                  style={{ margin: "30px 0px", display: "flex", gap: "25px" }}
+                >
                   <ActiveInfo data={student.statistics} />
-                </div>
-                <div style={{ margin: "30px 0px" }}>
+
                   <ActivityChart data={student.weeklyChart} />
                 </div>
                 <ActivityTable data={student.contentInteraction} />
               </Tab.Pane>
               <Tab.Pane eventKey="second">
-                <div style={{ margin: "30px 0px" }}>
+                <div
+                  style={{ margin: "30px 0px", display: "flex", gap: "25px" }}
+                >
                   <Performance data={student.performance} />
+                  <PerformanceChart data={student.performance} />
                 </div>
               </Tab.Pane>
-              <Tab.Pane eventKey="third"></Tab.Pane>
+              <Tab.Pane eventKey="third">
+                <AssignmentsTable data={student.formattedAssignments} />
+              </Tab.Pane>
+              <Tab.Pane eventKey="forth">
+                <QuizzesTable data={student.formattedQuizzes} />
+              </Tab.Pane>
             </Tab.Content>
           </Tab.Container>
         </div>
