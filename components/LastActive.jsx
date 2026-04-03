@@ -28,10 +28,17 @@ const Announcements = () => {
         backgroundColor: "white",
         padding: "10px",
         borderRadius: "10px",
+        width: "280px",
       }}
     >
       <div className="d-flex items-center justify-content-between">
-        <h4 style={{ marginBottom: "2px", marginTop: "2px", color: "black" }}>
+        <h4
+          style={{
+            marginBottom: "2px",
+            marginTop: "2px",
+            color: "black",
+          }}
+        >
           أحدث النشاطات
         </h4>
       </div>
@@ -66,7 +73,7 @@ const Announcements = () => {
                     color: "gray",
                     backgroundColor: "#f3d0faff",
                     borderRadius: "5px",
-                    fontSize: "13px",
+                    fontSize: "15px",
                   }}
                 >
                   {new Date(item.time).toLocaleDateString()}
@@ -76,7 +83,7 @@ const Announcements = () => {
               <p
                 style={{
                   color: "gray",
-                  fontSize: "14px",
+                  fontSize: "15px",
                   marginTop: "3px",
                 }}
               >

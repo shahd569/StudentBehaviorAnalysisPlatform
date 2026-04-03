@@ -65,7 +65,7 @@ export async function GET() {
         type: "assignment",
         studentName: `${item.student.firstName} ${item.student.lastName}`,
         image: item.student.profilePictureUrl,
-        action: `سلم واجب:${item.assignment.title}`,
+        action: `سلم واجب : ${item.assignment.title}`,
         time: item.submittedAt,
       })),
       ...recentQuizzes.map((item) => ({
@@ -73,7 +73,7 @@ export async function GET() {
         type: "quiz",
         studentName: `${item.student.firstName} ${item.student.lastName}`,
         image: item.student.profilePictureUrl,
-        action: `انهى اختبار:${item.quiz.title}`,
+        action: `انهى اختبار : ${item.quiz.title}`,
         time: item.finishTime,
         grade: item.score,
       })),
