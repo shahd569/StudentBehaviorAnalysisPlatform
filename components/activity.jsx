@@ -45,7 +45,7 @@ const ActivityChart = ({ data }) => {
         <Line
           type="monotone"
           dataKey="count"
-          stroke="#0fce28"
+          stroke="#DB24CC"
           strokeWidth={6}
           dot={{
             fill: "var(--color-surface-base)",

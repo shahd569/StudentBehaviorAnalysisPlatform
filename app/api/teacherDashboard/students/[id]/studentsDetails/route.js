@@ -132,6 +132,7 @@ export async function GET(req, { params }) {
           quiz: {
             select: {
               title: true,
+              maxScore: true,
               lesson: {
                 select: {
                   course: {
@@ -404,11 +405,26 @@ export async function GET(req, { params }) {
 
     //Quizzes
     const formattedQuizzes = quizzes.map((q) => {
+      let duration = "غير محدد";
+      if (q.startTime && q.finishTime) {
+        const diffInMs = new Date(q.finishTime) - new Date(q.startTime);
+        const totalMinutes = Math.round(diffInMs / (1000 * 60));
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+
+        if (hours > 0) {
+          duration = `${hours} ساعة و${minutes} دقائق`;
+        } else {
+          duration = `${minutes} دقيقة`;
+        }
+      }
+
       return {
         title: q.quiz.title,
         courseName: q.quiz.lesson.course.courseName,
         date: q.startTime,
-        score: q.score,
+        score: `${q.quiz.maxScore} / ${q.score} `,
+        duration: duration,
       };
     });
 

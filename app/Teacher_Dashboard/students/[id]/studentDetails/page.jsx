@@ -12,6 +12,9 @@ import ActivityChart from "@/components/activity";
 import PerformanceChart from "@/components/performanceChart";
 import AssignmentsTable from "@/components/StudentAssignments";
 import QuizzesTable from "@/components/StudentQuizzes";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Link from "next/link";
+import { faArrowAltCircleRight } from "@fortawesome/free-solid-svg-icons";
 
 const StudentDetails = ({ params }) => {
   const { id } = use(params);
@@ -49,9 +52,15 @@ const StudentDetails = ({ params }) => {
 
   const profileImage = student.personalInfo?.img || "/image/student.png";
   return (
-    <div style={{ display: "flex", paddingLeft: "18px" }}>
-      <div className="p-4 d-flex gap-5 flex-column col-md-9">
-        <div className="p-4 d-flex gap-5">
+    <div style={{ display: "flex", paddingLeft: "16px" }}>
+      <div className="p-4 d-flex flex-column col-md-9">
+        <Link href={"/Teacher_Dashboard/students"}>
+          <FontAwesomeIcon
+            icon={faArrowAltCircleRight}
+            style={{ fontSize: "30px", color: "#f1a9ef" }}
+          ></FontAwesomeIcon>
+        </Link>
+        <div className="p-4 d-flex gap-5" style={{ marginBottom: "30px" }}>
           <div
             className="rounded-circle d-flex align-items-center justify-content-center"
             style={{

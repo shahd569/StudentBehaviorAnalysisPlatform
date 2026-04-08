@@ -10,6 +10,7 @@ export default function QuizTable() {
   const [searchQuery, setSearchQuery] = useState("");
   const [objectFilter, setObjectFilter] = useState("الكل");
   const [courses, setCourses] = useState([]);
+  const [statusFilter, setStatusFilter] = useState("الكل");
 
   // 🔹 جلب البيانات
   useEffect(() => {
@@ -47,9 +48,14 @@ export default function QuizTable() {
     if (objectFilter !== "الكل") {
       result = result.filter((q) => q.courseName === objectFilter);
     }
+
+    // 2. فلتر الحالة
+    if (statusFilter !== "الكل") {
+      result = result.filter((student) => student.status === statusFilter);
+    }
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setDisplayedQuiz(result);
-  }, [searchQuery, objectFilter, quiz]);
+  }, [searchQuery, objectFilter, statusFilter, quiz]);
 
   return (
     <div
@@ -119,6 +125,23 @@ export default function QuizTable() {
                 {c}
               </option>
             ))}
+          </select>
+
+          {/* فلتر الحالة */}
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            style={{
+              backgroundColor: "#f5d7f4",
+              border: "none",
+              borderRadius: "10px",
+              padding: "5px",
+            }}
+          >
+            <option value="الكل">الحالة</option>
+            <option value="لم يبدأ بعد">لم يبدأ بعد</option>
+            <option value="نشط">نشط</option>
+            <option value="منتهي">منتهي</option>
           </select>
         </div>
       </div>

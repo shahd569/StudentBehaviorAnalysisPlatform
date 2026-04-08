@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Style from "@/components/table.module.css";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Link from "next/link";
 
 const Table = ({ assignments }) => {
   return (
@@ -59,10 +60,16 @@ const Table = ({ assignments }) => {
             </td>
 
             <td style={{ padding: "10px", borderRadius: "10px 0 0 10px" }}>
-              <FontAwesomeIcon
-                icon={faEye}
-                style={{ color: "gray" }}
-              ></FontAwesomeIcon>
+              <Link
+                href={`/Teacher_Dashboard/assignments/${item.id}/assignmentDetails`}
+              >
+                <button aria-label="عرض الواجب">
+                  <FontAwesomeIcon
+                    icon={faEye}
+                    style={{ color: "gray" }}
+                  ></FontAwesomeIcon>
+                </button>
+              </Link>
             </td>
           </tr>
         ))}

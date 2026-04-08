@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHome } from "@fortawesome/free-solid-svg-icons";
 import { links } from "./Menu";
 import Link from "next/link";
+import LogoutButton from "./LogoutButton";
 
 export default function Navbar() {
   return (
@@ -36,6 +37,7 @@ export default function Navbar() {
           {link.title}{" "}
         </Link>
       ))}
+      <LogoutButton />
     </div>
   );
 }

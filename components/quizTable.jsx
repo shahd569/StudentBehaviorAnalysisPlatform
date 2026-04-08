@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Style from "@/components/table.module.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye } from "@fortawesome/free-solid-svg-icons";
 
 const Table = ({ quizzes }) => {
   return (
@@ -29,7 +31,8 @@ const Table = ({ quizzes }) => {
           <th>الحالة</th>
           <th>عدد المتقدمين</th>
           <th>عدد غير المتقدمين</th>
-          <th style={{ borderRadius: "10px 0 0 10px" }}>متوسط الدرجات</th>
+          <th>متوسط الدرجات</th>
+          <th style={{ borderRadius: "10px 0 0 10px" }}>إجراء</th>
         </tr>
       </thead>
 
@@ -82,6 +85,12 @@ const Table = ({ quizzes }) => {
               >
                 {item.averageScore}
               </span>
+            </td>
+            <td style={{ padding: "10px", borderRadius: "10px 0 0 10px" }}>
+              <FontAwesomeIcon
+                icon={faEye}
+                style={{ color: "gray" }}
+              ></FontAwesomeIcon>
             </td>
           </tr>
         ))}

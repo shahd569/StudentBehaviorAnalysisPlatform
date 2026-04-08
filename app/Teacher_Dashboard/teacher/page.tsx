@@ -8,6 +8,7 @@ import Chart from "@/components/pieChart";
 import LastActivity from "@/components/LastActive";
 import AnnouncementsModal from "@/components/Announcement";
 import TestModal from "@/components/testModal";
+import ContentModal from "@/components/contentModal";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -73,7 +74,14 @@ export default function TeacherDashboard() {
             <BarChart />
           </div>
         </div>
-        <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <ContentModal></ContentModal>
           <AnnouncementsModal></AnnouncementsModal>
           <TestModal></TestModal>
         </div>

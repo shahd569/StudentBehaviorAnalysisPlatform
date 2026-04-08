@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBullhorn } from "@fortawesome/free-solid-svg-icons";
 
 export default function DonationModal() {
   const [show, setShow] = useState(false);
@@ -64,8 +66,28 @@ export default function DonationModal() {
 
   return (
     <>
-      <Button variant="primary" onClick={() => setShow(true)}>
-        اضغط هنا
+      <Button
+        className="shadow-sm"
+        style={{
+          width: "200px",
+          border: "3px solid rgb(253, 123, 199)",
+          backgroundColor: "white",
+          color: "#4e4e4e",
+          height: "30px",
+          fontSize: "20px",
+          borderRadius: "10px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+        variant="primary"
+        onClick={() => setShow(true)}
+      >
+        إنشاء إعلان
+        <FontAwesomeIcon
+          icon={faBullhorn}
+          style={{ color: "rgb(253, 123, 199)", fontSize: "20px" }}
+        ></FontAwesomeIcon>
       </Button>
 
       <Modal

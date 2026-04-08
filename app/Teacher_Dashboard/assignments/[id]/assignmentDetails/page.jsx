@@ -1,0 +1,98 @@
+"use client";
+import React, { useEffect, useState, use } from "react";
+import Table from "@/components/AssignmentDetails";
+
+const AssignmentDetails = ({ params }) => {
+  const { id } = use(params);
+
+  const [assignment, setAssignment] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchAssignmentData = async () => {
+      try {
+        const response = await fetch(
+          `/api/teacherDashboard/assignments/${id}/submissions`,
+        );
+        if (!response.ok) {
+          throw new Error("فشل في جلب البيانات");
+        }
+        const data = await response.json();
+        setAssignment(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAssignmentData();
+  }, [id]);
+
+  if (loading) return <div>جاري التحميل...</div>;
+  if (error) return <div>خطأ: {error}</div>;
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "3px",
+        padding: "20px 40px",
+        fontSize: "18px",
+      }}
+    >
+      <h1 style={{ fontWeight: "bold" }}>الواجبات</h1>
+      <p style={{ fontSize: "18px", fontWeight: "bold", color: "gray" }}>
+        إدارة وتتبع واجبات جميع المواد
+      </p>
+      <div
+        style={{
+          display: "flex",
+          marginTop: "20px",
+          marginBottom: "30px",
+        }}
+      >
+        <div
+          className="shadow-sm"
+          style={{
+            borderRadius: "15px",
+            border: "2px solid #ccc",
+            width: "500px",
+            height: "200px",
+            padding: "20px",
+            marginLeft: "50px",
+          }}
+        >
+          <p> نص الواجب : {assignment.assignment.content}</p>
+          <p> الدرجة القصوى : {assignment.assignment.maxScore}</p>
+          <p>
+            موعد التسليم النهائي :{" "}
+            {assignment.assignment.deliveryDate
+              ? new Date(assignment.assignment.deliveryDate)
+                  .toLocaleDateString("en-GB")
+                  .replace(/\//g, "-")
+              : "لا يوجد تسليم"}
+          </p>
+        </div>
+        <div
+          className="shadow-sm"
+          style={{
+            borderRadius: "15px",
+            border: "2px solid #ccc",
+            height: "200px",
+            width: "300px",
+            padding: "20px",
+          }}
+        >
+          {assignment.file}
+        </div>
+      </div>
+      <Table data={assignment.submissions} />
+    </div>
+  );
+};
+export default AssignmentDetails;

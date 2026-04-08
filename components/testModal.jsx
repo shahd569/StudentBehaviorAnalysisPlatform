@@ -4,6 +4,8 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Nav from "react-bootstrap/Nav";
 import Tab from "react-bootstrap/Tab";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faA } from "@fortawesome/free-solid-svg-icons";
 
 export default function TestModal() {
   const [show, setShow] = useState(false);
@@ -62,8 +64,28 @@ export default function TestModal() {
 
   return (
     <>
-      <Button variant="primary" onClick={() => setShow(true)}>
+      <Button
+        className="shadow-sm"
+        style={{
+          width: "200px",
+          border: "3px solid #e672fdff",
+          backgroundColor: "white",
+          color: "#4e4e4e",
+          height: "30px",
+          fontSize: "20px",
+          borderRadius: "10px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+        variant="primary"
+        onClick={() => setShow(true)}
+      >
         إنشاء اختبار
+        <FontAwesomeIcon
+          icon={faA}
+          style={{ color: "#e672fdff", fontSize: "20px" }}
+        ></FontAwesomeIcon>
       </Button>
 
       <Modal
@@ -477,11 +499,6 @@ export default function TestModal() {
                     </div>
                   </div>
                 </div>
-
-                {/* <div style={{display:"flex", justifyContent:"space-between",marginTop:"20px"}}>
-                  <button style={{border:"1px solid black", width:"150px", height:"45px", textAlign:"center", fontSize:"18px", borderRadius:"5px"}}>السابق</button>
-                  <button style={{border:"1px solid black", width:"150px", height:"45px", textAlign:"center", fontSize:"18px", borderRadius:"5px"}}>التالي</button>
-                </div> */}
               </Tab.Pane>
             </Tab.Content>
           </Tab.Container>

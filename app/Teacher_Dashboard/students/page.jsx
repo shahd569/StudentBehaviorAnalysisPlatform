@@ -146,7 +146,7 @@ export default function StudentsTable() {
             >
               <option value="الكل">كل مستويات الأداء</option>
               <option value="ممتاز">ممتاز</option>
-              <option value="جيد">جيد</option>
+              <option value="جــيــد">جــيــد</option>
               <option value="ضعيف">ضعيف</option>
             </select>
 
