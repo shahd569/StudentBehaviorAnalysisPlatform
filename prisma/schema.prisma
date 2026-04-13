@@ -6,7 +6,6 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  // directUrl = env("DIRECT_URL")
 }
 
 model Users {
@@ -75,7 +74,7 @@ model Lesson {
 model Video {
   id           Int                @id @default(autoincrement())
   url          String
-  duration     Int //ثانية
+  duration     Int
   lessonId     Int
   lesson       Lesson             @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   interactions VideoInteraction[]
@@ -103,6 +102,7 @@ model AssignmentSubmission {
   submissionUrl  String?
   submittedAt    DateTime         @default(now())
   teacherComment String?
+  notes          String?
   status         submissionStatus
   assignment     Assignment       @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
   student        Users            @relation(fields: [studentId], references: [id], onDelete: Cascade)
@@ -159,12 +159,12 @@ model QuizAttempt {
 
 model VideoInteraction {
   id                 Int                    @id @default(autoincrement())
-  timestamp          DateTime               @default(now())  // متى وقع التفاعل (التاريخ والوقت)
+  timestamp          DateTime               @default(now())
   studentId          Int
   videoId            Int
   interactionType    TypeOfVideoInteraction
-  currentTimeSeconds Int // في اي ثانية من الفيديو كان يشاهد عندما وقع التفاعل
-  value              Float? // اذا كان التفاعل تغيير السرعة فهو يخزن القيمة مثل 1.5
+  currentTimeSeconds Int
+  value              Float?
   student            Users                  @relation(fields: [studentId], references: [id], onDelete: Cascade)
   video              Video                  @relation(fields: [videoId], references: [id], onDelete: Cascade)
 }
@@ -193,11 +193,11 @@ model AlertAndRecommendations {
   alertType     AlerType
   triggerReason TriggerReason
   content       String
-  title         String?
   createdAt     DateTime      @default(now())
   isRead        Boolean       @default(false)
   studentId     Int
   lessonId      Int?
+  title         String?
   lesson        Lesson?       @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   student       Users         @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }

@@ -63,7 +63,20 @@ const Table = ({ data }) => {
                     .replace(/\//g, "-")
                 : "لا يوجد تسليم"}
             </td>
-            <td>{item.fileUrl}</td>
+            <td>
+              {item.fileUrl ? (
+                <a
+                  href={item.fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  // style={{ color: "#e672fd", textDecoration: "underline" }}
+                >
+                  🗂️
+                </a>
+              ) : (
+                "لا يوجد ملف"
+              )}
+            </td>
             <td>{item.score}</td>
             <td style={{ padding: "10px", borderRadius: "10px 0 0 10px" }}>
               <FontAwesomeIcon

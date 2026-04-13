@@ -33,6 +33,7 @@ export async function GET(req, { params }) {
           content: true,
           deliveryDate: true,
           maxScore: true,
+          resources: true,
         },
       }),
     ]);

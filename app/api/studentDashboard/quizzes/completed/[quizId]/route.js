@@ -3,8 +3,8 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(req, { params }) {
   try {
-    const { attemptId } = await params;
-    const id = parseInt(attemptId);
+    const { quizCorrectAnswers } = await params;
+    const id = parseInt(quizCorrectAnswers);
     if (isNaN(id)) {
       return NextResponse.json({ message: "ID غير صالح" }, { status: 400 });
     }
@@ -14,16 +14,19 @@ export async function GET(req, { params }) {
         id: id,
       },
       include: {
-        student: {
-          select: {
-            firstName: true,
-            lastName: true,
-          },
-        },
         quiz: {
           include: {
             questions: {
               orderBy: { id: "asc" },
+            },
+            lesson: {
+              include: {
+                course: {
+                  select: {
+                    courseName: true,
+                  },
+                },
+              },
             },
           },
         },
@@ -55,7 +58,7 @@ export async function GET(req, { params }) {
     );
     return NextResponse.json(
       {
-        studentName: `${attempt.student.firstName} ${attempt.student.lastName}`,
+        courseName: attempt.quiz.lesson.course.courseName,
         score: attempt.score,
         maxScore: attempt.quiz.maxScore,
         details: questionsWithStudentAnswers,

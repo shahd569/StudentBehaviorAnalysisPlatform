@@ -78,6 +78,7 @@ const AssignmentDetails = ({ params }) => {
               : "لا يوجد تسليم"}
           </p>
         </div>
+
         <div
           className="shadow-sm"
           style={{
@@ -86,9 +87,40 @@ const AssignmentDetails = ({ params }) => {
             height: "200px",
             width: "300px",
             padding: "20px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center",
           }}
         >
-          {assignment.file}
+          {assignment.assignment.resources &&
+          assignment.assignment.resources.length > 0 ? (
+            <div>
+              <p style={{ fontSize: "14px", marginBottom: "10px" }}>
+                ملف المدرس المرفق
+              </p>
+              {/* أيقونة تعبيرية للملف */}
+              <div style={{ fontSize: "40px", marginBottom: "10px" }}>📄</div>
+              <a
+                href={assignment.assignment.resources[0].resourceURL}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  padding: "8px 15px",
+                  backgroundColor: "#e672fd",
+                  color: "white",
+                  borderRadius: "8px",
+                  textDecoration: "none",
+                  fontSize: "14px",
+                }}
+              >
+                معاينة الملف
+              </a>
+            </div>
+          ) : (
+            <p style={{ color: "gray" }}>لا يوجد ملف مرفق من المدرس</p>
+          )}
         </div>
       </div>
       <Table data={assignment.submissions} />

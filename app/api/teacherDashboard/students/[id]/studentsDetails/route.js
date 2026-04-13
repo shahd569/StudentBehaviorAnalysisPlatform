@@ -111,6 +111,7 @@ export async function GET(req, { params }) {
           assignment: {
             select: {
               title: true,
+              maxScore: true,
               lesson: {
                 select: {
                   course: {
@@ -399,13 +400,16 @@ export async function GET(req, { params }) {
         courseName: a.assignment.lesson.course.courseName,
         date: a.submittedAt,
         status: a.status === "SUBMITTED" ? "تم التسليم ⏰" : "تم التصحيح ✅",
-        score: a.finalScore ?? "غير محدد",
+        score: a.finalScore
+          ? `${a.finalScore} / ${a.assignment.maxScore}`
+          : "غير محدد",
       };
     });
 
     //Quizzes
     const formattedQuizzes = quizzes.map((q) => {
       let duration = "غير محدد";
+
       if (q.startTime && q.finishTime) {
         const diffInMs = new Date(q.finishTime) - new Date(q.startTime);
         const totalMinutes = Math.round(diffInMs / (1000 * 60));
@@ -423,7 +427,7 @@ export async function GET(req, { params }) {
         title: q.quiz.title,
         courseName: q.quiz.lesson.course.courseName,
         date: q.startTime,
-        score: `${q.quiz.maxScore} / ${q.score} `,
+        score: `${q.score} / ${q.quiz.maxScore}`,
         duration: duration,
       };
     });
