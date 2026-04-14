@@ -83,12 +83,11 @@ export async function GET() {
     const performanceAvg = (assignmentAvg + quizAvg) / 2;
 
     // learning hours
-    //  اريد ان يرجع الوقت بالساعات فقط اذا كان بالساعات اما اذا كان اقل من ساعة ف اريده بالدقائق
     const totalLearningHours = userSessions.reduce((total, session) => {
       if (session.status === "ENDED") {
         const duration =
           (new Date(session.endTime) - new Date(session.startTime)) /
-          (1000 * 60 * 60); // Convert milliseconds to hours
+          (1000 * 60 * 60);
         return total + duration;
       }
       return total;
@@ -96,10 +95,8 @@ export async function GET() {
 
     let learningHours;
     if (totalLearningHours < 1) {
-      // Return minutes, rounded
       learningHours = `${Math.round(totalLearningHours * 60)} دقيقة`;
     } else {
-      // Return hours, rounded to 1 decimal
       learningHours = `${Number(totalLearningHours.toFixed(1))} ساعة`;
     }
 
