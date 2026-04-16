@@ -14,19 +14,19 @@ export async function GET() {
     // }
     // const studentId = parseInt(session.user.id);
     const studentId = 15;
+    const enrollments = await prisma.Enrollment.findMany({
+      where: {
+        studentId: studentId,
+      },
+      select: { courseId: true },
+    });
+    const courseIds = enrollments.map((e) => e.courseId);
     const [
-      activeCoursesCount,
       allStudentAssignment,
       studentAssignmentSubmissions,
       allQuizAttempt,
       userSessions,
     ] = await Promise.all([
-      prisma.Enrollment.count({
-        where: {
-          studentId: studentId,
-        },
-        select: { courseId: true },
-      }),
       prisma.Assignment.findMany({
         where: { lesson: { courseId: { in: courseIds } } },
         include: {
@@ -52,18 +52,18 @@ export async function GET() {
     ]);
 
     // pending tasks
-    const courseIds = activeCoursesCount.map((e) => e.courseId);
     const submissionsIds = studentAssignmentSubmissions.map(
       (a) => a.assignmentId,
     );
 
     const filteredAssignments = allStudentAssignment.filter(
-      (a) => !submissionsIds.includes(a.id),
+      (a) =>
+        !submissionsIds.includes(a.id) && new Date(a.deliveryDate) > new Date(),
     );
     const pendingTasks = filteredAssignments.length;
     // performance avg
-    const assignmentScoreSum = 0;
-    const assignmentCount = 0;
+    let assignmentScoreSum = 0;
+    let assignmentCount = 0;
     const assignment = studentAssignmentSubmissions.map((a) => {
       if (a.finalScore != null) {
         assignmentScoreSum += a.finalScore;
@@ -71,8 +71,8 @@ export async function GET() {
       }
     });
     const assignmentAvg = assignmentScoreSum / assignmentCount;
-    const quizScoreSum = 0;
-    const quizCount = 0;
+    let quizScoreSum = 0;
+    let quizCount = 0;
     const quizzes = allQuizAttempt.map((q) => {
       if (q.score != null) {
         quizScoreSum += q.score;
@@ -94,15 +94,17 @@ export async function GET() {
     }, 0);
 
     let learningHours;
-    if (totalLearningHours < 1) {
-      learningHours = `${Math.round(totalLearningHours * 60)} دقيقة`;
+    const hours = Math.floor(totalLearningHours);
+    const minutes = Math.round((totalLearningHours - hours) * 60);
+    if (hours > 0) {
+      learningHours = `${hours} ساعة و${minutes} دقائق`;
     } else {
-      learningHours = `${Number(totalLearningHours.toFixed(1))} ساعة`;
+      learningHours = `${minutes} دقيقة`;
     }
 
     return NextResponse.json(
       {
-        activeCoursesCount: activeCoursesCount,
+        activeCoursesCount: courseIds.length,
         pendingTasks: pendingTasks,
         performanceAvg: performanceAvg,
         learningHours: learningHours,
