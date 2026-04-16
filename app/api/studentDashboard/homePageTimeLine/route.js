@@ -115,12 +115,14 @@ export async function GET() {
 
     const finalData = [
       ...filteredAssignments.map((a) => ({
+        type: "assignment",
         assignmentTitle: a.title,
         courseName: a.lesson.course.courseName,
         timeRemaining: formatTimeRemaining(a.deliveryDate),
         _remainingMs: getRemainingMs(a.deliveryDate),
       })),
       ...filteredQuizzes.map((q) => ({
+        type: "quiz",
         quizTitle: q.title,
         courseName: q.lesson.course.courseName,
         timeRemaining: formatTimeRemaining(q.dueDate),
