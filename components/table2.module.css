@@ -1,0 +1,5 @@
+table tbody tr:nth-child(even) {
+    background-color: #D7E2F5;}
+table tbody tr:nth-child(odd) {
+    background-color: white;
+}

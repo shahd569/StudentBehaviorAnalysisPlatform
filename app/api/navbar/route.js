@@ -6,17 +6,17 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     // 1. التحقق من هوية المستخدم المسجل
-    // const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions);
 
-    // if (!session || !session.user) {
-    //   return NextResponse.json(
-    //     { message: "غير مصرح بالدخول" },
-    //     { status: 401 },
-    //   );
-    // }
+    if (!session || !session.user) {
+      return NextResponse.json(
+        { message: "غير مصرح بالدخول" },
+        { status: 401 },
+      );
+    }
 
-    // const userId = parseInt(session.user.id);
-    const userId = 17;
+    const userId = parseInt(session.user.id);
+    // const userId = 17;
 
     // 2. جلب البيانات الشخصية مع عداد الإشعارات والرسائل في استعلام واحد
     const userData = await prisma.users.findUnique({

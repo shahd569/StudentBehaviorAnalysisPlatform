@@ -15,9 +15,8 @@ export async function POST(req) {
 
     const file = formData.get("file");
 
-    let attachementUrl = null;
-
-    if (file && typeof file === "object") {
+    let fileUrl = formData.get("fileUrl")?.toString() || null;
+    if (!fileUrl && file && typeof file === "object") {
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
 
@@ -33,14 +32,17 @@ export async function POST(req) {
 
       await writeFile(uploadPath, buffer);
 
-      attachementUrl = `/uploads/${fileName}`;
+      fileUrl = `/uploads/${fileName}`;
     }
     const newAnnouncement = await prisma.Announcement.create({
       data: {
         title,
         content,
-        courseId: receiver === "طلاب المادة" ? parseInt(course) : null,
-        attachmentURL: attachementUrl,
+        course:
+          receiver === "طلاب المادة"
+            ? { connect: { id: parseInt(course) } }
+            : undefined,
+        attachmentURL: fileUrl,
       },
     });
 
@@ -63,9 +65,9 @@ export async function POST(req) {
       }
 
       // إنشاء إشعارات في جدول التنبيهات لجميع الطلاب المستهدفين
-      await prisma.alertAndRecommendations.createMany({
+      await prisma.AlertAndRecommendations.createMany({
         data: targetStudentIds.map((id) => ({
-          studentId: id,
+          userId: id,
           alertType: "ANNOUNCEMENT",
           triggerReason: "NEW_CONTENT",
           content: `قام الأستاذ بنشر إعلان جديد بخصوص ${content}`,

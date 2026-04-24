@@ -8,6 +8,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { SignInResponse } from "next-auth/react";
 
+type ExtendedUser = {
+  id: string;
+  role: string;
+  email?: string | null;
+  name?: string | null;
+  image?: string | null;
+  sessionId?: string | null;
+};
+
 export default function Login() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -32,7 +41,12 @@ export default function Login() {
       if (session?.user?.role === "TEACHER") {
         router.push("/Teacher_Dashboard/teacher");
       } else if (session?.user?.role === "STUDENT") {
-        router.push("/Student_Dashboard/student");
+        // الجلسة في ذاكرة المتصفح لاستخدامه في التتبع id تخزين
+        const user = session.user as ExtendedUser;
+        if (user.sessionId) {
+          sessionStorage.setItem("currentSessionId", user.sessionId.toString());
+        }
+        router.push("/Student_Dashboard");
       } else {
         alert("مرحباً بك أيها المدير");
       }

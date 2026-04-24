@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import styles from "./TeacherRegister.module.css";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function TeacherRegister() {
   const [firstName, setFirstName] = useState("");
@@ -27,6 +28,28 @@ export default function TeacherRegister() {
     setLoading(true);
 
     try {
+      let profilePictureUrl = null;
+
+      if (avatar) {
+        const fileName = `${Date.now()}_${avatar.name}`;
+
+        const { data, error } = await supabase.storage
+          .from("user-profile-picture")
+          .upload(fileName, avatar, { upsert: false });
+
+        if (error) {
+          alert("حدث خطأ في رفع الصورة: " + error.message);
+          setLoading(false);
+          return;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from("user-profile-picture")
+          .getPublicUrl(fileName);
+
+        profilePictureUrl = publicUrlData.publicUrl;
+      }
+
       const formData = new FormData();
 
       formData.append("firstName", firstName);
@@ -36,8 +59,8 @@ export default function TeacherRegister() {
       formData.append("employeeId", jobNumber);
       formData.append("role", "TEACHER");
 
-      if (avatar) {
-        formData.append("avatar", avatar);
+      if (profilePictureUrl) {
+        formData.append("profilePictureUrl", profilePictureUrl);
       }
 
       const res = await fetch("/api/newAccount", {
@@ -53,7 +76,7 @@ export default function TeacherRegister() {
         return;
       }
 
-      alert("تم إنشاء حساب الطالب بنجاح!");
+      alert("تم إنشاء حساب المدرس بنجاح!");
       router.push("/login");
     } catch (error) {
       console.error(error);

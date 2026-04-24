@@ -23,15 +23,13 @@ export async function POST(req) {
 
     const avatar = formData.get("avatar");
 
-    let profilePictureUrl = null;
-
-    if (avatar && typeof avatar === "object") {
+    let profilePictureUrl =
+      formData.get("profilePictureUrl")?.toString() || null;
+    if (!profilePictureUrl && avatar && typeof avatar === "object") {
       const bytes = await avatar.arrayBuffer();
       const buffer = Buffer.from(bytes);
-
       const ext = avatar.name.split(".").pop();
       const fileName = `${crypto.randomUUID()}.${ext}`;
-
       const uploadPath = path.join(
         process.cwd(),
         "public",
@@ -40,8 +38,7 @@ export async function POST(req) {
       );
 
       await writeFile(uploadPath, buffer);
-
-      profilePictureUrl = `/uploads/${fileName}`;
+      profilePictureUrl = `/uploads/${fileName}`; // حفظ المسار المحلي في قاعدة البيانات
     }
 
     const existingUserByEmail = await prisma.Users.findUnique({

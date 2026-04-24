@@ -34,6 +34,7 @@ export async function GET() {
 
     const formattedAssignments = assignments.map((a) => {
       return {
+        id: a.id,
         title: a.assignment.title,
         courseName: a.assignment.lesson.course.courseName,
         date: a.submittedAt,

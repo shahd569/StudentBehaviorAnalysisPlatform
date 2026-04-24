@@ -51,6 +51,7 @@ export async function GET() {
       }
 
       return {
+        id: q.id,
         title: q.quiz.title,
         courseName: q.quiz.lesson.course.courseName,
         date: q.startTime,

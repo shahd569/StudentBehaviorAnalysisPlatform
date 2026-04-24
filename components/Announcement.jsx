@@ -4,6 +4,37 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBullhorn } from "@fortawesome/free-solid-svg-icons";
+import { supabase } from "@/lib/supabaseClient";
+
+// دالة تحاول الرفع للسحابة مع خاصية إعادة المحاولة
+const uploadToCloudWithRetry = async (file, bucket, retries = 3) => {
+  const fileName = `${Date.now()}_${file.name}`;
+
+  for (let i = 0; i < retries; i++) {
+    try {
+      const { data, error } = await supabase.storage
+        .from(bucket)
+        .upload(fileName, file, { upsert: false });
+
+      if (error) throw error; // catch إذا وجد خطأ ننتقل لـ
+
+      // إذا نجح الرفع، نجلب الرابط العام
+      const { data: publicUrlData } = supabase.storage
+        .from(bucket)
+        .getPublicUrl(fileName);
+
+      return publicUrlData.publicUrl;
+    } catch (err) {
+      console.error(`المحاولة رقم ${i + 1} فشلت:`, err.message);
+
+      //لنبدأ الرفع المحلي null إذا كانت هذه آخر محاولة، نرجع
+      if (i === retries - 1) return null;
+      // انتظار بسيط قبل إعادة المحاولة (مثلاً 1 ثانية)
+      await new Promise((res) => setTimeout(res, 1000));
+    }
+  }
+  return null; // في حال فشل جميع المحاولات، نرجع null
+};
 
 export default function DonationModal() {
   const [show, setShow] = useState(false);
@@ -27,14 +58,29 @@ export default function DonationModal() {
 
   const handleSubmit = async () => {
     try {
+      let fileUrl = null;
+      let fallbackFile = null; // سنحتاجه في حال فشل السحابة
+
+      if (file) {
+        // محاولة الرفع للسحابة بـ 3 محاولات
+        fileUrl = await uploadToCloudWithRetry(file, "announcement-resources");
+
+        //هذا يعني فشل السحابة بعد 3 محاولات null اذا عادت الدالة ب
+        if (!fileUrl) {
+          console.warn("فشل الرفع للسحابة نهائياً، سيتم التخزين محلياً.");
+          fallbackFile = file;
+        }
+      }
       const formData = new FormData();
       formData.append("title", title);
       formData.append("content", content);
       formData.append("course", course);
       formData.append("receiver", receiver);
       formData.append("notify", notify);
-      if (file) {
-        formData.append("file", file);
+      if (fileUrl) {
+        formData.append("fileUrl", fileUrl);
+      } else if (fallbackFile) {
+        formData.append("file", fallbackFile); // إرسال الملف الخام في حال فشل السحابة
       }
 
       const res = await fetch("/api/announcements", {
