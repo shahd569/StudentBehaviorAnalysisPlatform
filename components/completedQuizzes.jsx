@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Style from "@/components/table2.module.css";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Link from "next/link";
 
 const Table = ({ quizzes, loading }) => {
   if (loading) return <p>جاري التحميل...</p>;
@@ -66,9 +67,14 @@ const Table = ({ quizzes, loading }) => {
             </td>
 
             <td style={{ padding: "10px", borderRadius: "10px 0 0 10px" }}>
-              {/* <Link href={`/students/${item.id}/studentsDetails`}>
-                <button aria-label="عرض الواجب"><FontAwesomeIcon icon={faEye} style={{color:"gray"}}></FontAwesomeIcon></button>
-              </Link> */}
+              <Link href={`/Student_Dashboard/quizzes/completed/${item.id}`}>
+                <button aria-label="عرض الاختبار">
+                  <FontAwesomeIcon
+                    icon={faEye}
+                    style={{ color: "gray" }}
+                  ></FontAwesomeIcon>
+                </button>
+              </Link>
             </td>
           </tr>
         ))}

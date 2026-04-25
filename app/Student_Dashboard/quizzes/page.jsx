@@ -1,33 +1,32 @@
 "use client";
 import Nav from "react-bootstrap/Nav";
 import Tab from "react-bootstrap/Tab";
-import Table from "@/components/complitedAssignment";
+import Table from "@/components/completedQuizzes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { useState, useEffect } from "react";
-import Cards from "@/components/assignmentCards/AssignmentCards";
+import Cards from "@/components/quizCards/QuizCards";
 
-export default function Assignment() {
-  const [allAssignments, setAllAssignments] = useState([]);
-  const [displayedAssignments, setDisplayedAssignments] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function Quiz() {
+  const [allQuizzes, setAllQuizzes] = useState([]);
+  const [displayedQuizzes, setDisplayedQuizzes] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("الكل");
   const [objectFilter, setObjectFilter] = useState("الكل");
   const [courses, setCourses] = useState([]);
 
   useEffect(() => {
-    const fetchAssignments = async () => {
+    const fetchQuizzes = async () => {
       try {
-        const res = await fetch("/api/studentDashboard/assignments/completed");
+        const res = await fetch("/api/studentDashboard/quizzes/completed"); // تأكدي من المسار
         const data = await res.json();
-
         if (res.ok) {
-          setAllAssignments(data.completedAssignments || []);
-          setDisplayedAssignments(data.completedAssignments || []);
+          setAllQuizzes(data.completedQuizzes || []);
+          setDisplayedQuizzes(data.completedQuizzes || []);
         }
 
-        const allCourses = data.completedAssignments.flatMap((s) => {
+        const allCourses = data.completedQuizzes.flatMap((s) => {
           if (!s.courses) return [];
           const courseArray = Array.isArray(s.courses)
             ? s.courses
@@ -39,44 +38,41 @@ export default function Assignment() {
 
         setCourses(uniqeCourses);
       } catch (error) {
-        console.error("خطأ في جلب البيانات:", error);
+        console.error("خطأ في الجلب:", error);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchAssignments();
+    fetchQuizzes();
   }, []);
 
   // 2. تحديث الفلترة عند تغيير نص البحث أو البيانات الأصلية
   useEffect(() => {
-    let result = allAssignments;
+    let result = allQuizzes;
 
     if (searchQuery) {
-      result = allAssignments.filter((assignment) =>
-        assignment.title.toLowerCase().includes(searchQuery.toLowerCase()),
+      result = allQuizzes.filter((quiz) =>
+        quiz.title.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
 
     if (statusFilter !== "الكل") {
-      result = result.filter(
-        (assignment) => assignment.status === statusFilter,
-      );
+      result = result.filter((quiz) => quiz.status === statusFilter);
     }
 
     if (objectFilter !== "الكل") {
-      result = result.filter((assignment) => {
-        if (!assignment.courses) return false;
+      result = result.filter((quiz) => {
+        if (!quiz.courses) return false;
 
-        const assignmentsCoursesText = Array.isArray(assignment.courses)
-          ? assignment.courses.join(" ")
-          : assignment.courses;
+        const quizzesCoursesText = Array.isArray(quiz.courses)
+          ? quiz.courses.join(" ")
+          : quiz.courses;
 
-        return assignmentsCoursesText.includes(objectFilter);
+        return quizzesCoursesText.includes(objectFilter);
       });
     }
-    setDisplayedAssignments(result);
-  }, [searchQuery, allAssignments, statusFilter, objectFilter]); // تشغيل الفلترة فقط عند تغير البحث
+    setDisplayedQuizzes(result);
+  }, [searchQuery, allQuizzes, statusFilter, objectFilter]); // تشغيل الفلترة فقط عند تغير البحث
   return (
     <div
       style={{
@@ -87,7 +83,7 @@ export default function Assignment() {
         fontSize: "18px",
       }}
     >
-      <h1 style={{ fontWeight: "bold" }}>الواجبات</h1>
+      <h1 style={{ fontWeight: "bold" }}>الاختبارات</h1>
       <Tab.Container defaultActiveKey="first">
         <Nav
           variant="tabs"
@@ -148,7 +144,7 @@ export default function Assignment() {
                 onChange={(e) => setSearchQuery(e.target.value)}
               ></input>
             </div>
-            <Table data={displayedAssignments} loading={loading} />
+            <Table quizzes={displayedQuizzes} />
           </Tab.Pane>
           <Tab.Pane eventKey="second">
             <div

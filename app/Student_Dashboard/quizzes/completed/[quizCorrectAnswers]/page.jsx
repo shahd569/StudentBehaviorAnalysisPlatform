@@ -1,61 +1,48 @@
 "use client";
 
-import React from "react";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { useRouter, useParams } from "next/navigation";
 
 export default function QuizReviewPage() {
   const router = useRouter();
+  const params = useParams(); // لجلب الرقم من الرابط
+  const [quizData, setQuizData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // بيانات تجريبية (سيتم استبدالها لاحقاً ببيانات الـ API الحقيقية)
-  const quizData = {
-    subject: "الذكاء الاصطناعي",
-    totalScore: 80,
-    questions: [
-      {
-        id: 1,
-        text: "سؤال تجريبي 1",
-        points: 20,
-        options: ["خيار 1", "خيار 2", "خيار 3", "خيار 4"],
-        correctIndex: 1,
-        userIndex: 3,
-      },
-      {
-        id: 2,
-        text: "سؤال تجريبي 2",
-        points: 20,
-        options: ["خيار 1", "خيار 2", "خيار 3", "خيار 4"],
-        correctIndex: 0,
-        userIndex: 0,
-      },
-      {
-        id: 3,
-        text: "سؤال تجريبي 3",
-        points: 20,
-        options: ["خيار 1", "خيار 2", "خيار 3", "خيار 4"],
-        correctIndex: 2,
-        userIndex: 2,
-      },
-      {
-        id: 4,
-        text: "سؤال تجريبي 4",
-        points: 20,
-        options: ["خيار 1", "خيار 2", "خيار 3", "خيار 4"],
-        correctIndex: 1,
-        userIndex: 1,
-      },
-    ],
-  };
+  const attemptId = params.quizCorrectAnswers;
+
+  useEffect(() => {
+    const fetchQuizDetails = async () => {
+      try {
+        // الروت الخاص بكِ مع تمرير الـ ID
+        const res = await fetch(
+          `/api/studentDashboard/quizzes/completed/${attemptId}`,
+        );
+        const data = await res.json();
+        if (res.ok) {
+          setQuizData(data);
+        }
+      } catch (error) {
+        console.error("خطأ في جلب تفاصيل الاختبار:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (attemptId) fetchQuizDetails();
+  }, [attemptId]);
+
+  if (loading)
+    return <div className="text-center mt-5">جاري تحميل النتائج...</div>;
+  if (!quizData)
+    return <div className="text-center mt-5">لم يتم العثور على بيانات.</div>;
 
   return (
     <div
       className="container-fluid"
-      style={{
-        minHeight: "100vh",
-        padding: "40px",
-        direction: "rtl", // الاتجاه الأساسي من اليمين
-      }}
+      style={{ minHeight: "100vh", padding: "40px", direction: "rtl" }}
     >
-      {/* الجزء العلوي: المادة والدرجة يميناً والرجوع يساراً */}
+      {/* الجزء العلوي: بيانات حقيقية من الـ API */}
       <div
         className="d-flex justify-content-between align-items-center mb-4"
         style={{
@@ -86,7 +73,7 @@ export default function QuizReviewPage() {
                 backgroundColor: "#f9f9f9",
               }}
             >
-              {quizData.subject}
+              {quizData.courseName}
             </div>
           </div>
           <div>
@@ -109,10 +96,11 @@ export default function QuizReviewPage() {
                 backgroundColor: "#f9f9f9",
               }}
             >
-              {quizData.totalScore}
+              {quizData.score} / {quizData.maxScore}
             </div>
           </div>
         </div>
+
         <button
           onClick={() => router.back()}
           className="btn btn-light"
@@ -120,16 +108,15 @@ export default function QuizReviewPage() {
             border: "1px solid #ccc",
             borderRadius: "8px",
             padding: "8px 30px",
-            fontWeight: "500",
           }}
         >
           رجوع
         </button>
       </div>
 
-      {/* قسم الأسئلة */}
+      {/* قسم الأسئلة الديناميكي */}
       <div className="row g-4">
-        {quizData.questions.map((q, index) => (
+        {quizData.details.map((q, index) => (
           <div key={index} className="col-md-6">
             <div
               style={{
@@ -139,7 +126,6 @@ export default function QuizReviewPage() {
                 border: "1px solid #eee",
               }}
             >
-              {/* رأس السؤال: السهم والنص يميناً .. والدرجة يساراً */}
               <div className="d-flex align-items-center mb-3">
                 <span
                   style={{
@@ -160,7 +146,7 @@ export default function QuizReviewPage() {
                     backgroundColor: "#F8F8F8",
                   }}
                 >
-                  {q.text}
+                  {q.questionText}
                 </div>
                 <span
                   style={{
@@ -171,38 +157,42 @@ export default function QuizReviewPage() {
                     marginRight: "15px",
                   }}
                 >
-                  {q.points} درجة
+                  {q.scoreValue} درجة
                 </span>
               </div>
 
-              {/* الخيارات: النص والمربع كلاهما بجهة اليمين (المربع أقصى اليمين) */}
               <div className="d-flex flex-column gap-2">
                 {q.options.map((option, optIndex) => {
                   let bgColor = "#F8F8F8";
-                  if (optIndex === q.correctIndex) bgColor = "#ACFF93";
+
+                  // نقوم بطرح 1 من القيم القادمة من الـ API لتتوافق مع index المصفوفة (0, 1, 2, 3)
+                  const correctAnswerIndex = q.correctAnswer - 1;
+                  const studentAnswerIndex = q.studentAnswer - 1;
+
+                  // 1. تحديد اللون الأخضر للإجابة الصحيحة
+                  if (optIndex === correctAnswerIndex) {
+                    bgColor = "#ACFF93";
+                  }
+                  // 2. تحديد اللون الأحمر إذا كانت إجابة الطالب خاطئة وهذ هو خيار الطالب
                   else if (
-                    optIndex === q.userIndex &&
-                    q.userIndex !== q.correctIndex
-                  )
+                    optIndex === studentAnswerIndex &&
+                    q.isCorrect === false
+                  ) {
                     bgColor = "#FFB3B3";
+                  }
 
                   return (
                     <div
                       key={optIndex}
                       className="d-flex align-items-center gap-2"
                     >
-                      {/* المربع يميناً (تحت السهم تقريباً) */}
                       <input
                         type="checkbox"
-                        checked={optIndex === q.userIndex}
+                        // المربع يظهر مختاراً إذا كان هذا هو ترتيب إجابة الطالب
+                        checked={optIndex === studentAnswerIndex}
                         readOnly
-                        style={{
-                          width: "18px",
-                          height: "18px",
-                          cursor: "default",
-                        }}
+                        style={{ width: "18px", height: "18px" }}
                       />
-                      {/* النص بجانبه */}
                       <div
                         className="flex-grow-1"
                         style={{
@@ -211,7 +201,6 @@ export default function QuizReviewPage() {
                           padding: "10px",
                           borderRadius: "5px",
                           textAlign: "right",
-                          fontSize: "15px",
                         }}
                       >
                         {option}

@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Style from "@/components/table2.module.css";
-import { faEye } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faEye, faPen } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Link from "next/link";
 
 const Table = ({ data, loading }) => {
   if (loading) return <p>جاري تحميل الواجبات...</p>;
@@ -69,10 +70,34 @@ const Table = ({ data, loading }) => {
 
             <td>{item.score}</td>
 
-            <td style={{ padding: "10px", borderRadius: "10px 0 0 10px" }}>
-              {/* <Link href={`/students/${item.id}/studentsDetails`}>
-                <button aria-label="عرض الواجب"><FontAwesomeIcon icon={faEye} style={{color:"gray"}}></FontAwesomeIcon></button>
-              </Link> */}
+            <td
+              style={{
+                padding: "10px",
+                borderRadius: "10px 0 0 10px",
+              }}
+            >
+              <Link
+                href={`/Student_Dashboard/assignments/completed/${item.id}/availableForEdit`}
+                style={{ padding: "10px" }}
+              >
+                <button aria-label="عرض الواجب">
+                  <FontAwesomeIcon
+                    icon={faEye}
+                    style={{ color: "gray" }}
+                  ></FontAwesomeIcon>
+                </button>
+              </Link>
+
+              <Link
+                href={`/Student_Dashboard/assignments/completed/${item.id}/assignmentFinalScore`}
+              >
+                <button aria-label="تعديل الواجب">
+                  <FontAwesomeIcon
+                    icon={faPen}
+                    style={{ color: "gray" }}
+                  ></FontAwesomeIcon>
+                </button>
+              </Link>
             </td>
           </tr>
         ))}

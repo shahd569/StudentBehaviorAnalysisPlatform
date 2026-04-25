@@ -5,17 +5,17 @@ import { authOptions } from "@/lib/auth";
 
 export async function GET() {
   try {
-    // const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions);
 
-    // if (!session || !session.user || session.user.role !== "STUDENT") {
-    //   return NextResponse.json(
-    //     { message: "غير مسموح لك بالوصول لهذه البيانات" },
-    //     { status: 401 },
-    //   );
-    // }
+    if (!session || !session.user || session.user.role !== "STUDENT") {
+      return NextResponse.json(
+        { message: "غير مسموح لك بالوصول لهذه البيانات" },
+        { status: 401 },
+      );
+    }
 
-    // const studentId = parseInt(session?.user.id);
-    const studentId = 18;
+    const studentId = parseInt(session?.user.id);
+    // const studentId = 18;
     // جلب جميع الدورات المسجل فيها الطالب
     const enrollments = await prisma.Enrollment.findMany({
       where: { studentId: studentId },

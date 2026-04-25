@@ -24,7 +24,7 @@ export const links = [
     id: 3,
     icon: faClipboardList,
     title: "الاختبارات",
-    url: "/Student_Dashboard/quiz",
+    url: "/Student_Dashboard/quizzes",
   },
   {
     id: 4,
