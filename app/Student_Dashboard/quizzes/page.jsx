@@ -15,22 +15,31 @@ export default function Quiz() {
   const [statusFilter, setStatusFilter] = useState("الكل");
   const [objectFilter, setObjectFilter] = useState("الكل");
   const [courses, setCourses] = useState([]);
+  const [availableQuizzes, setAvailableQuizzes] = useState([]);
+  const [filteredAvailable, setFilteredAvailable] = useState([]);
 
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
         const res = await fetch("/api/studentDashboard/quizzes/completed"); // تأكدي من المسار
         const data = await res.json();
+
+        const res2 = await fetch("/api/studentDashboard/quizzes/available");
+        const data2 = await res2.json();
+
+        setAvailableQuizzes(data2.quizzes || []);
+        setFilteredAvailable(data2.quizzes || []);
+
         if (res.ok) {
           setAllQuizzes(data.completedQuizzes || []);
           setDisplayedQuizzes(data.completedQuizzes || []);
         }
 
-        const allCourses = data.completedQuizzes.flatMap((s) => {
-          if (!s.courses) return [];
-          const courseArray = Array.isArray(s.courses)
-            ? s.courses
-            : s.courses.split("،").map((item) => item.trim());
+        const allCourses = data2.quizzes.flatMap((s) => {
+          if (!s.courseName) return [];
+          const courseArray = Array.isArray(s.courseName)
+            ? s.courseName
+            : s.courseName.split("،").map((item) => item.trim());
           return courseArray;
         });
 
@@ -46,7 +55,6 @@ export default function Quiz() {
     fetchQuizzes();
   }, []);
 
-  // 2. تحديث الفلترة عند تغيير نص البحث أو البيانات الأصلية
   useEffect(() => {
     let result = allQuizzes;
 
@@ -72,7 +80,27 @@ export default function Quiz() {
       });
     }
     setDisplayedQuizzes(result);
-  }, [searchQuery, allQuizzes, statusFilter, objectFilter]); // تشغيل الفلترة فقط عند تغير البحث
+  }, [searchQuery, allQuizzes, statusFilter, objectFilter]);
+  useEffect(() => {
+    let result = availableQuizzes;
+
+    if (searchQuery) {
+      result = result.filter((a) =>
+        a.title.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+    }
+
+    if (statusFilter !== "الكل") {
+      result = result.filter((a) => a.status === statusFilter);
+    }
+
+    if (objectFilter !== "الكل") {
+      result = result.filter((a) => a.courseName.includes(objectFilter));
+    }
+
+    setFilteredAvailable(result);
+  }, [searchQuery, statusFilter, objectFilter, availableQuizzes]);
+
   return (
     <div
       style={{
@@ -224,7 +252,7 @@ export default function Quiz() {
                        {" "}
               </select>
             </div>
-            <Cards></Cards>
+            <Cards quizzes={filteredAvailable} />{" "}
           </Tab.Pane>
         </Tab.Content>
       </Tab.Container>

@@ -1,33 +1,50 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 export async function PATCH(req) {
   const { attemptId, answers } = await req.json();
+  const attemptIdInt = parseInt(attemptId);
 
   try {
     //جلب بيانات المحاولة مع الأسئلة لحساب النتيجة
     const attempt = await prisma.quizAttempt.findUnique({
-      where: { id: attemptId },
-      include: { quiz: { include: { questions: true } } },
+      where: { id: attemptIdInt },
+      include: {
+        quiz: {
+          include: {
+            questions: {
+              orderBy: { id: "asc" }, // ✅ الحل هنا
+            },
+          },
+        },
+      },
     });
 
     //  منطق حساب الدرجة (Server-side)
     let totalScore = 0;
-    attempt.quiz.questions.forEach((q, index) => {
-      if (answers[index] === q.correctAnswerIndex) {
+    attempt.quiz.questions.forEach((q) => {
+      if (answers[String(q.id)] === q.correctAnswerIndex) {
         totalScore += q.scoreValue;
       }
     });
 
-    // تحديث السجل بوقت الانتهاء والدرجة
+    const answersArray = attempt.quiz.questions.map((q) => {
+      return answers[String(q.id)] ?? null;
+    });
+
     const updatedAttempt = await prisma.quizAttempt.update({
-      where: { id: attemptId },
+      where: { id: attemptIdInt },
       data: {
         finishTime: new Date(),
         score: totalScore,
-        submittedAnswers: answers,
+        submittedAnswers: answersArray,
       },
     });
-
+    console.log("answers raw:", answers);
+    console.log(
+      "question ids:",
+      attempt.quiz.questions.map((q) => q.id),
+    );
     return NextResponse.json({ success: true, score: totalScore });
   } catch (error) {
     console.error(error);

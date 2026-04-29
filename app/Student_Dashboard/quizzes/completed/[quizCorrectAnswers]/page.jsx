@@ -5,7 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 
 export default function QuizReviewPage() {
   const router = useRouter();
-  const params = useParams(); // لجلب الرقم من الرابط
+  const params = useParams();
   const [quizData, setQuizData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -14,7 +14,6 @@ export default function QuizReviewPage() {
   useEffect(() => {
     const fetchQuizDetails = async () => {
       try {
-        // الروت الخاص بكِ مع تمرير الـ ID
         const res = await fetch(
           `/api/studentDashboard/quizzes/completed/${attemptId}`,
         );
@@ -42,7 +41,6 @@ export default function QuizReviewPage() {
       className="container-fluid"
       style={{ minHeight: "100vh", padding: "40px", direction: "rtl" }}
     >
-      {/* الجزء العلوي: بيانات حقيقية من الـ API */}
       <div
         className="d-flex justify-content-between align-items-center mb-4"
         style={{
@@ -114,7 +112,6 @@ export default function QuizReviewPage() {
         </button>
       </div>
 
-      {/* قسم الأسئلة الديناميكي */}
       <div className="row g-4">
         {quizData.details.map((q, index) => (
           <div key={index} className="col-md-6">
@@ -165,16 +162,12 @@ export default function QuizReviewPage() {
                 {q.options.map((option, optIndex) => {
                   let bgColor = "#F8F8F8";
 
-                  // نقوم بطرح 1 من القيم القادمة من الـ API لتتوافق مع index المصفوفة (0, 1, 2, 3)
                   const correctAnswerIndex = q.correctAnswer - 1;
                   const studentAnswerIndex = q.studentAnswer - 1;
 
-                  // 1. تحديد اللون الأخضر للإجابة الصحيحة
                   if (optIndex === correctAnswerIndex) {
                     bgColor = "#ACFF93";
-                  }
-                  // 2. تحديد اللون الأحمر إذا كانت إجابة الطالب خاطئة وهذ هو خيار الطالب
-                  else if (
+                  } else if (
                     optIndex === studentAnswerIndex &&
                     q.isCorrect === false
                   ) {
@@ -188,7 +181,6 @@ export default function QuizReviewPage() {
                     >
                       <input
                         type="checkbox"
-                        // المربع يظهر مختاراً إذا كان هذا هو ترتيب إجابة الطالب
                         checked={optIndex === studentAnswerIndex}
                         readOnly
                         style={{ width: "18px", height: "18px" }}

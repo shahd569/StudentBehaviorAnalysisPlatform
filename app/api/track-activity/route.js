@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { sessionId, activityType, pageUrl } = body;
+    const { sessionId, activityType, pageUrl, lessonId } = body;
 
     // التأكد من وجود الجلسة وصلاحيتها قبل التسجيل
     if (!sessionId) {
@@ -21,6 +21,7 @@ export async function POST(req) {
         activityType,
         pageUrl,
         timestamp: new Date(), // الوقت الحالي للنشاط
+        lessonId: lessonId || null,
       },
     });
 

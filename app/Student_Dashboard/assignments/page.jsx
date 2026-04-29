@@ -15,6 +15,8 @@ export default function Assignment() {
   const [statusFilter, setStatusFilter] = useState("الكل");
   const [objectFilter, setObjectFilter] = useState("الكل");
   const [courses, setCourses] = useState([]);
+  const [availableAssignments, setAvailableAssignments] = useState([]);
+  const [filteredAvailable, setFilteredAvailable] = useState([]);
 
   useEffect(() => {
     const fetchAssignments = async () => {
@@ -22,16 +24,24 @@ export default function Assignment() {
         const res = await fetch("/api/studentDashboard/assignments/completed");
         const data = await res.json();
 
+        const res2 = await fetch("/api/studentDashboard/assignments/available");
+        const data2 = await res2.json();
+
+        setAvailableAssignments(data2.assignments || []);
+        setFilteredAvailable(data2.assignments || []);
+
         if (res.ok) {
           setAllAssignments(data.completedAssignments || []);
           setDisplayedAssignments(data.completedAssignments || []);
+          // console.log(objectFilter);
+          // console.log(availableAssignments.map((a) => a.courseName));
         }
 
-        const allCourses = data.completedAssignments.flatMap((s) => {
-          if (!s.courses) return [];
-          const courseArray = Array.isArray(s.courses)
-            ? s.courses
-            : s.courses.split("،").map((item) => item.trim());
+        const allCourses = data2.assignments.flatMap((s) => {
+          if (!s.courseName) return [];
+          const courseArray = Array.isArray(s.courseName)
+            ? s.courseName
+            : s.courseName.split("،").map((item) => item.trim());
           return courseArray;
         });
 
@@ -77,6 +87,27 @@ export default function Assignment() {
     }
     setDisplayedAssignments(result);
   }, [searchQuery, allAssignments, statusFilter, objectFilter]); // تشغيل الفلترة فقط عند تغير البحث
+
+  useEffect(() => {
+    let result = availableAssignments;
+
+    if (searchQuery) {
+      result = result.filter((a) =>
+        a.title.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+    }
+
+    if (statusFilter !== "الكل") {
+      result = result.filter((a) => a.status === statusFilter);
+    }
+
+    if (objectFilter !== "الكل") {
+      result = result.filter((a) => a.courseName.includes(objectFilter));
+    }
+
+    setFilteredAvailable(result);
+  }, [searchQuery, statusFilter, objectFilter, availableAssignments]);
+
   return (
     <div
       style={{
@@ -228,7 +259,7 @@ export default function Assignment() {
                        {" "}
               </select>
             </div>
-            <Cards></Cards>
+            <Cards assignments={filteredAvailable} />{" "}
           </Tab.Pane>
         </Tab.Content>
       </Tab.Container>

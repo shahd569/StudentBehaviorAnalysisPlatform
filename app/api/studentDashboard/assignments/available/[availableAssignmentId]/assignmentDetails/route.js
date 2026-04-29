@@ -47,6 +47,7 @@ export async function GET(req, { params }) {
       deliveryDate: assignment.deliveryDate,
       createdAt: assignment.createdAt,
       allowedExtensions: assignment.allowedExtensions,
+      // allowedExtensions: JSON.parse(assignment.allowedExtensions || "[]"),
       resourceURL: assignment.resources.map((r) => r.resourceURL),
     };
 

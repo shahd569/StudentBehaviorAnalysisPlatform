@@ -2,20 +2,18 @@ import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
-import { title } from "node:process";
-import { time } from "node:console";
 
 export async function GET() {
   try {
-    // const session = getServerSession(authOptions);
-    // if (!session || !session.user || session.user.role !== "STUDENT") {
-    //   return NextResponse.json(
-    //     { message: "غير مسموح لك بالوصول لهذه البيانات" },
-    //     { status: 401 },
-    //   );
-    // }
-    // const studentId = parseInt(session.user.id);
-    const studentId = 15;
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user || session.user.role !== "STUDENT") {
+      return NextResponse.json(
+        { message: "غير مسموح لك بالوصول لهذه البيانات" },
+        { status: 401 },
+      );
+    }
+    const studentId = parseInt(session.user.id);
+    // const studentId = 15;
 
     const [
       recentAlertAndRecommendation,
@@ -23,7 +21,7 @@ export async function GET() {
       recentQuizGrade,
     ] = await Promise.all([
       prisma.AlertAndRecommendations.findMany({
-        where: { studentId: studentId },
+        where: { userId: studentId },
         orderBy: { createdAt: "desc" },
         take: 3,
       }),

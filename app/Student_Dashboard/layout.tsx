@@ -42,7 +42,6 @@ export default function Teacher_DashboardLayout({
         }}
       >
         <Navbar></Navbar>
-        {/* 2. نضع المتتبع هنا ليغلف كل الصفحات الداخلة في الداشبورد */}
         <ActivityTracker>{children}</ActivityTracker>
       </div>
     </div>

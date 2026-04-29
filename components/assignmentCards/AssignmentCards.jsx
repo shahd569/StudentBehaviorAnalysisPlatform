@@ -23,32 +23,16 @@
 
 import { useEffect, useState } from "react";
 import Style from "./cards.module.css";
+import { useRouter } from "next/navigation";
 
-export default function AssignmentCards() {
-  const [assignments, setAssignments] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function AssignmentCards({ assignments }) {
+  const router = useRouter();
 
-  useEffect(() => {
-    const fetchAssignments = async () => {
-      try {
-        const res = await fetch("/api/studentDashboard/assignments/available");
-        const data = await res.json();
-
-        if (res.ok) {
-          setAssignments(data.assignments);
-        }
-      } catch (error) {
-        console.error("خطأ في جلب الواجبات:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAssignments();
-  }, []);
-
-  if (loading) return <p>جاري تحميل الواجبات...</p>;
-
+  const handleStartAssignment = async (item) => {
+    // 2. التوجه لصفحة الأسئلة مع تمرير معرف المحاولة أو الاختبار
+    router.push(`/Student_Dashboard/assignments/available/${item.id}`);
+  };
+  if (!assignments) return <p>لا يوجد بيانات</p>;
   return (
     <div className={Style.cards}>
       {assignments.map((item, index) => (
@@ -101,6 +85,7 @@ export default function AssignmentCards() {
 
           <div style={{ display: "flex", justifyContent: "end" }}>
             <button
+              disabled={item.status !== "متاح"}
               style={{
                 borderRadius: "5px",
                 backgroundColor: "#5194F8",
@@ -110,7 +95,10 @@ export default function AssignmentCards() {
                 height: "40px",
                 textAlign: "center",
                 marginTop: "20px",
+                cursor: item.status === "متاح" ? "pointer" : "not-allowed",
+                opacity: item.status === "متاح" ? 1 : 0.6,
               }}
+              onClick={() => handleStartAssignment(item)}
             >
               ابدأ الحل
             </button>

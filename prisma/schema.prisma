@@ -71,6 +71,7 @@ model Lesson {
   quiz                     Quiz[]
   videos                   Video[]
   resources                Resource[]
+  activities               PlatformActivity[]
 }
 
 model Video {
@@ -196,6 +197,8 @@ model PlatformActivity {
   timestamp    DateTime    @default(now())
   activityType String
   pageUrl      String
+  lessonId     Int?
+  lesson       Lesson?     @relation(fields: [lessonId], references: [id])
   session      UserSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 }
 

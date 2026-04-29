@@ -11,11 +11,18 @@ export default function ActivityTracker({
   const pathname = usePathname(); // لمراقبة أي تغيير في الرابط (الانتقال بين الصفحات)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null); // مرجع لساعة التوقيت الخاصة بالخمول
 
+  // من الرابط lessonId استخراج
+  const getLessonId = () => {
+    const match = pathname.match(/lesson\/(\d+)/);
+    return match ? parseInt(match[1]) : null;
+  };
+
   // --- 1. دالة تسجيل النشاط في قاعدة البيانات ---
   const logActivity = async (type: string, details = "") => {
     const sessionId = sessionStorage.getItem("currentSessionId");
     if (!sessionId) return; // إذا لم توجد جلسة نشطة، لا يسجل شيئاً
 
+    const lessonId = getLessonId();
     try {
       await fetch("/api/track-activity", {
         method: "POST",
@@ -24,6 +31,7 @@ export default function ActivityTracker({
           sessionId: parseInt(sessionId),
           activityType: type,
           pageUrl: window.location.href,
+          lessonId,
         }),
       });
     } catch (err) {

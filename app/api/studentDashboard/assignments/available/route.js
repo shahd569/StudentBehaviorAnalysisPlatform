@@ -56,6 +56,7 @@ export async function GET() {
       const status = isAvailable ? "متاح" : "غير متاح";
 
       return {
+        id: a.id,
         title: a.title,
         courseName: a.lesson.course.courseName,
         endDate: a.deliveryDate

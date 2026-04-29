@@ -1,14 +1,15 @@
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
+import { authOptions } from "../../../../../lib/auth";
 
 export async function GET() {
   try {
-    // const session = await getServerSession(authOptions);
-    // if (!session || !session.user || session.user.role !== "STUDENT") {
-    //   return NextResponse.json({ message: "غير مسموح" }, { status: 401 });
-    // }
-    // const studentId = parseInt(session.user.id);
-    const studentId = 15;
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user || session.user.role !== "STUDENT") {
+      return NextResponse.json({ message: "غير مسموح" }, { status: 401 });
+    }
+    const studentId = parseInt(session.user.id);
+    // const studentId = 15;
     const assignments = await prisma.AssignmentSubmission.findMany({
       where: {
         studentId: studentId,

@@ -5,15 +5,15 @@ import { getServerSession } from "next-auth";
 
 export async function GET() {
   try {
-    // const session = getServerSession(authOptions);
-    // if (!session || !session.user || session.user.role !== "STUDENT") {
-    //   return NextResponse.json(
-    //     { message: "غير مسموح لك بالوصول لهذه البيانات" },
-    //     { status: 401 },
-    //   );
-    // }
-    // const studentId = parseInt(session.user.id);
-    const studentId = 15;
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user || session.user.role !== "STUDENT") {
+      return NextResponse.json(
+        { message: "غير مسموح لك بالوصول لهذه البيانات" },
+        { status: 401 },
+      );
+    }
+    const studentId = parseInt(session.user.id);
+    // const studentId = 15;
     const enrollments = await prisma.Enrollment.findMany({
       where: {
         studentId: studentId,
@@ -115,6 +115,7 @@ export async function GET() {
 
     const finalData = [
       ...filteredAssignments.map((a) => ({
+        id: a.id,
         type: "assignment",
         assignmentTitle: a.title,
         courseName: a.lesson.course.courseName,
@@ -122,6 +123,7 @@ export async function GET() {
         _remainingMs: getRemainingMs(a.deliveryDate),
       })),
       ...filteredQuizzes.map((q) => ({
+        id: q.id,
         type: "quiz",
         quizTitle: q.title,
         courseName: q.lesson.course.courseName,

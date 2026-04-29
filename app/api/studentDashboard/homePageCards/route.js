@@ -1,19 +1,19 @@
 import { getServerSession } from "next-auth";
-import { prisma } from "@/lib/prisma";
+import { authOptions } from "../../../../lib/auth";
+import { prisma } from "../../../../lib/prisma";
 import { NextResponse } from "next/server";
-import { authOptions } from "@/lib/auth";
 
 export async function GET() {
   try {
-    // const session = getServerSession(authOptions);
-    // if (!session || !session.user || session.user.role !== "STUDENT") {
-    //   return NextResponse.json(
-    //     { message: "غير مسموح لك بالوصول لهذه البيانات" },
-    //     { status: 401 },
-    //   );
-    // }
-    // const studentId = parseInt(session.user.id);
-    const studentId = 15;
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user || session.user.role !== "STUDENT") {
+      return NextResponse.json(
+        { message: "غير مسموح لك بالوصول لهذه البيانات" },
+        { status: 401 },
+      );
+    }
+    const studentId = parseInt(session.user.id);
+    // const studentId = 15;
     const enrollments = await prisma.Enrollment.findMany({
       where: {
         studentId: studentId,
@@ -97,9 +97,9 @@ export async function GET() {
     const hours = Math.floor(totalLearningHours);
     const minutes = Math.round((totalLearningHours - hours) * 60);
     if (hours > 0) {
-      learningHours = `${hours} ساعة و${minutes} دقائق`;
+      learningHours = `${hours}h`;
     } else {
-      learningHours = `${minutes} دقيقة`;
+      learningHours = `${minutes}m`;
     }
 
     return NextResponse.json(

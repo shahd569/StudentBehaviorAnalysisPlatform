@@ -61,6 +61,7 @@ export async function GET() {
       const status = isAvailable ? "متاح" : "غير متاح";
 
       return {
+        id: q.id,
         title: q.title,
         courseName: q.lesson.course.courseName,
         maxScore: q.maxScore,
