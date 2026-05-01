@@ -19,6 +19,12 @@ export async function PATCH(req) {
         },
       },
     });
+    if (!attempt) {
+      return NextResponse.json(
+        { message: "المحاولة غير موجودة" },
+        { status: 404 },
+      );
+    }
 
     //  منطق حساب الدرجة (Server-side)
     let totalScore = 0;
@@ -29,7 +35,7 @@ export async function PATCH(req) {
     });
 
     const answersArray = attempt.quiz.questions.map((q) => {
-      return answers[String(q.id)] ?? null;
+      return answers[String(q.id)] ?? 0;
     });
 
     const updatedAttempt = await prisma.quizAttempt.update({

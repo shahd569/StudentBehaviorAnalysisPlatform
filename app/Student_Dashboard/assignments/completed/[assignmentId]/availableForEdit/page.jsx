@@ -1,3 +1,246 @@
+// "use client";
+// import { useEffect, useState } from "react";
+// import { useParams, useRouter } from "next/navigation";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+// import {
+//   faTasks,
+//   faCalendar,
+//   faStar,
+//   faCloudUpload,
+//   faPen,
+// } from "@fortawesome/free-solid-svg-icons";
+
+// export default function Assignment() {
+//   const params = useParams();
+//   const router = useRouter();
+//   const attemptId = params.assignmentId;
+
+//   const [notes, setNotes] = useState("");
+//   const [data, setData] = useState();
+
+//   const [isEditing, setIsEditing] = useState(false); // ⭐️ جديد
+
+//   useEffect(() => {
+//     const fetchAssignment = async () => {
+//       try {
+//         const res = await fetch(
+//           `/api/studentDashboard/assignments/completed/${attemptId}/studentAssignmentDetails`,
+//         );
+//         const result = await res.json();
+
+//         if (res.ok) {
+//           setData(result.assignmentInfo);
+
+//           // نحط الملاحظات القديمة )
+//           if (result.assignmentInfo.notes) {
+//             setNotes(result.assignmentInfo.notes);
+//           }
+//         }
+//       } catch (error) {
+//         console.error("Error fetching assignment:", error);
+//       }
+//     };
+
+//     if (attemptId) {
+//       fetchAssignment();
+//     }
+//   }, [attemptId]);
+
+//   if (!data) return <p>جاري التحميل...</p>;
+
+//   const handleUpdate = async () => {
+//     try {
+//       const res = await fetch(
+//         "/api/studentDashboard/assignments/available/submit",
+//         {
+//           method: "POST",
+//           headers: {
+//             "Content-Type": "application/json",
+//           },
+//           body: JSON.stringify({
+//             assignmentId: attemptId,
+//             notes: notes,
+//           }),
+//         },
+//       );
+
+//       const result = await res.json();
+
+//       if (!res.ok) throw new Error(result.message);
+
+//       alert("تم تعديل الواجب بنجاح ✅");
+//       setIsEditing(false);
+//     } catch (err) {
+//       console.error(err);
+//       alert("فشل التعديل ❌");
+//     }
+//   };
+
+//   return (
+//     <div
+//       style={{
+//         display: "flex",
+//         flexDirection: "column",
+//         gap: "30px",
+//         padding: "20px",
+//       }}
+//     >
+//       <div style={{ display: "flex", justifyContent: "end" }}>
+//         <button
+//           style={{
+//             border: "3px solid #ccc",
+//             width: "60px",
+//             borderRadius: "10px",
+//             boxShadow: "0 4px 4px #ccc",
+//           }}
+//           onClick={() => router.push("/Student_Dashboard/assignments")}
+//         >
+//           رجوع
+//         </button>
+//       </div>
+
+//       {/* معلومات الواجب */}
+//       <div
+//         style={{
+//           display: "flex",
+//           flexDirection: "column",
+//           backgroundColor: "white",
+//           borderRadius: "10px",
+//           padding: "10px",
+//         }}
+//       >
+//         <div style={{ display: "flex", padding: "10px", alignItems: "center" }}>
+//           <FontAwesomeIcon
+//             icon={faTasks}
+//             style={{
+//               width: "30px",
+//               height: "30px",
+//               color: "blue",
+//               marginLeft: "20px",
+//             }}
+//           />
+//           <div>
+//             <span>{data.title}</span>
+//             <span>مقرر : {data.courseName}</span>
+//           </div>
+//         </div>
+
+//         <div
+//           style={{
+//             border: "1px solid gray",
+//             backgroundColor: "#eee",
+//             display: "flex",
+//             gap: "100px",
+//             padding: "10px",
+//           }}
+//         >
+//           <div>
+//             <FontAwesomeIcon icon={faCalendar} />
+//             <p>{new Date(data.deliveryDate).toLocaleDateString()}</p>
+//           </div>
+
+//           <div>
+//             <FontAwesomeIcon icon={faStar} />
+//             <p>{data.maxScore}</p>
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* الوصف */}
+//       <div style={{ display: "flex", gap: "20px" }}>
+//         <div
+//           style={{
+//             backgroundColor: "white",
+//             borderRadius: "10px",
+//             padding: "10px",
+//             minHeight: "120px",
+//             width: "60%",
+//           }}
+//         >
+//           <p>{data.content}</p>
+//         </div>
+
+//         <div
+//           style={{
+//             backgroundColor: "white",
+//             borderRadius: "10px",
+//             padding: "10px",
+//             minHeight: "120px",
+//             width: "40%",
+//           }}
+//         >
+//           <p>الملفات المرفقة :</p>
+
+//           {data.resourceURL?.map((file, index) => (
+//             <a
+//               key={index}
+//               href={file}
+//               target="_blank"
+//               style={{ display: "block", color: "blue" }}
+//             >
+//               ملف {index + 1}
+//             </a>
+//           ))}
+//         </div>
+//       </div>
+
+//       <div
+//         style={{
+//           backgroundColor: "white",
+//           borderRadius: "10px",
+//           padding: "10px",
+//         }}
+//       >
+//         <div style={{ display: "flex", justifyContent: "space-between" }}>
+//           <div style={{ display: "flex", gap: "10px" }}>
+//             <FontAwesomeIcon icon={faPen} />
+//             <p>ملاحظاتك</p>
+//           </div>
+
+//           {/* زر التعديل */}
+//           <FontAwesomeIcon
+//             icon={faPen}
+//             style={{ cursor: "pointer" }}
+//             onClick={() => setIsEditing(true)}
+//           />
+//         </div>
+
+//         <textarea
+//           value={notes}
+//           disabled={!isEditing}
+//           onChange={(e) => setNotes(e.target.value)}
+//           style={{
+//             width: "100%",
+//             border: "1px solid #eee",
+//             padding: "5px",
+//             marginTop: "10px",
+//             backgroundColor: isEditing ? "white" : "#f5f5f5",
+//           }}
+//         />
+//       </div>
+
+//       {/* زر التحديث */}
+//       {isEditing && (
+//         <div style={{ display: "flex", justifyContent: "end" }}>
+//           <button
+//             onClick={handleUpdate}
+//             style={{
+//               width: "100px",
+//               borderRadius: "5px",
+//               backgroundColor: "#5194F8",
+//               color: "white",
+//               boxShadow: "0 4px 4px #ccc",
+//             }}
+//           >
+//             تحديث
+//           </button>
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
+
 "use client";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -46,23 +289,32 @@ export default function Assignment() {
   const params = useParams();
   // const { availableAssignmentId } = useParams();
   const router = useRouter();
-  const attemptId = params.availableAssignmentId;
+  const attemptId = params.assignmentId;
 
-  const [assignmentId, setAssignmentId] = useState();
+  // const [assignmentId, setAssignmentId] = useState();
   const [notes, setNotes] = useState();
   const [submissionUrl, setSubmissionUrl] = useState();
   const [data, setData] = useState();
   // const [file, setFile] = useState(null);
+  const [isEditing, setIsEditing] = useState(false); // ⭐️ جديد
 
   useEffect(() => {
     const fetchAssignment = async () => {
       try {
         const res = await fetch(
-          `/api/studentDashboard/assignments/available/${attemptId}/assignmentDetails`,
+          `/api/studentDashboard/assignments/completed/${attemptId}/studentAssignmentDetails`,
         );
         const result = await res.json();
         if (res.ok) {
           setData(result.assignmentInfo);
+        }
+        // نحط الملاحظات القديمة )
+        if (result.assignmentInfo.notes) {
+          setNotes(result.assignmentInfo.notes);
+        }
+
+        if (result.assignmentInfo.submissionUrl) {
+          setSubmissionUrl(result.assignmentInfo.submissionUrl);
         }
       } catch (error) {
         console.error("Error fetching assignment:", error);
@@ -257,7 +509,7 @@ export default function Assignment() {
               target="_blank"
               style={{ display: "block", color: "blue" }}
             >
-              {/* ملف {index + 1} */}
+              {/* {decodeURIComponent(file.split("/").pop())} */}
               الملف الذي رفعه المدرس 📄
             </a>
           ))}
@@ -303,8 +555,6 @@ export default function Assignment() {
                   background: "#5194F8",
                   color: "white",
                   borderRadius: "5px",
-                  display: "block",
-                  textAlign: "center",
                 }}
               >
                 رفع ملف
@@ -312,7 +562,19 @@ export default function Assignment() {
             </>
           ) : (
             <>
-              <p style={{ textAlign: "center" }}>📄 {submissionUrl.name}</p>
+              <p style={{ textAlign: "center" }}>
+                {" "}
+                <a
+                  href={submissionUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {/* الملف الذي رفعته مسبقا 📄 */}
+                  {submissionUrl instanceof File
+                    ? submissionUrl.name
+                    : decodeURIComponent(submissionUrl.split("/").pop())}
+                </a>
+              </p>
 
               <input
                 type="file"
@@ -341,6 +603,7 @@ export default function Assignment() {
             </>
           )}
         </div>
+
         {/* <p>{JSON.stringify(data.allowedExtensions)}</p> */}
         <p style={{ marginLeft: "auto", marginRight: "auto", color: "gray" }}>
           الأنواع المسموحة :{" "}
@@ -365,21 +628,31 @@ export default function Assignment() {
           minHeight: "120px",
         }}
       >
-        <div style={{ display: "flex", gap: "20px" }}>
-          <FontAwesomeIcon icon={faPen} />
-          <p>ملاحظاتك</p>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <FontAwesomeIcon icon={faPen} />
+            <p>ملاحظاتك</p>
+          </div>
+
+          {/* زر التعديل */}
+          <FontAwesomeIcon
+            icon={faPen}
+            style={{ cursor: "pointer" }}
+            onClick={() => setIsEditing(true)}
+          />
         </div>
+
         <textarea
-          value={notes || ""}
+          value={notes}
+          disabled={!isEditing}
           onChange={(e) => setNotes(e.target.value)}
           style={{
             width: "100%",
             border: "1px solid #eee",
-            // height: "40px",
-            minHeight: "40px",
             padding: "5px",
+            marginTop: "10px",
+            backgroundColor: isEditing ? "white" : "#f5f5f5",
           }}
-          placeholder="اكتب ملاحظاتك هنا..."
         />
       </div>
 

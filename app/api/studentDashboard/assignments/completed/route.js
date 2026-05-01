@@ -19,6 +19,7 @@ export async function GET() {
           select: {
             title: true,
             maxScore: true,
+            deliveryDate: true,
             lesson: {
               select: {
                 course: {
@@ -43,6 +44,7 @@ export async function GET() {
         score: a.finalScore
           ? `${a.finalScore} / ${a.assignment.maxScore}`
           : "غير محدد",
+        deliveryDate: a.assignment.deliveryDate,
       };
     });
 

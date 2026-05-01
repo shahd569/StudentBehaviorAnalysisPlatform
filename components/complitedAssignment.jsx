@@ -77,7 +77,7 @@ const Table = ({ data, loading }) => {
               }}
             >
               <Link
-                href={`/Student_Dashboard/assignments/completed/${item.id}/availableForEdit`}
+                href={`/Student_Dashboard/assignments/completed/${item.id}/assignmentFinalScore`}
                 style={{ padding: "10px" }}
               >
                 <button aria-label="عرض الواجب">
@@ -88,16 +88,23 @@ const Table = ({ data, loading }) => {
                 </button>
               </Link>
 
-              <Link
-                href={`/Student_Dashboard/assignments/completed/${item.id}/assignmentFinalScore`}
-              >
-                <button aria-label="تعديل الواجب">
-                  <FontAwesomeIcon
-                    icon={faPen}
-                    style={{ color: "gray" }}
-                  ></FontAwesomeIcon>
+              {new Date() > new Date(item.deliveryDate) ? (
+                <button
+                  disabled
+                  aria-label="انتهى وقت التعديل"
+                  style={{ opacity: 0.5, cursor: "not-allowed" }}
+                >
+                  <FontAwesomeIcon icon={faPen} style={{ color: "gray" }} />
                 </button>
-              </Link>
+              ) : (
+                <Link
+                  href={`/Student_Dashboard/assignments/completed/${item.id}/availableForEdit`}
+                >
+                  <button aria-label="تعديل الواجب">
+                    <FontAwesomeIcon icon={faPen} style={{ color: "gray" }} />
+                  </button>
+                </Link>
+              )}
             </td>
           </tr>
         ))}
