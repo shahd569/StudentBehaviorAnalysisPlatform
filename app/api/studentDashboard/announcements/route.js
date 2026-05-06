@@ -26,11 +26,15 @@ export async function GET() {
       where: {
         OR: [{ courseId: { in: courseIds } }, { courseId: null }],
       },
+      orderBy: {
+        createdAt: "desc",
+      },
       select: {
         content: true,
         createdAt: true,
         attachmentURL: true,
         title: true,
+        id: true,
         course: {
           select: {
             instructor: {
@@ -43,15 +47,35 @@ export async function GET() {
         },
       },
     });
+
+    const alerts = await prisma.AlertAndRecommendations.findMany({
+      where: {
+        userId: studentId,
+        alertType: "ANNOUNCEMENT",
+      },
+      select: {
+        announcementId: true,
+        isRead: true,
+      },
+    });
+
+    console.log("announcements:", announcements);
+    console.log("alerts:", alerts);
     const announcementInfo = announcements.map((a) => {
+      const alert = alerts.find(
+        (al) => Number(al.announcementId) === Number(a.id),
+      );
       return {
+        id: a.id,
         title: a.title,
         content: a.content,
         createdAt: a.createdAt,
         attachmentURL: a.attachmentURL,
         teacherName: a.course
           ? `${a.course.instructor.firstName} ${a.course.instructor.lastName}`
-          : null,
+          : "إعلان عام",
+        isRead: alert ? alert.isRead : true,
+        // alert: alert ? alert : null,
       };
     });
     return NextResponse.json({ announcementInfo });

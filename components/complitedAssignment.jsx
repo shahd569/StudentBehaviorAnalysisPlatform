@@ -88,7 +88,8 @@ const Table = ({ data, loading }) => {
                 </button>
               </Link>
 
-              {new Date() > new Date(item.deliveryDate) ? (
+              {new Date() > new Date(item.deliveryDate) ||
+              item.status == "تم التصحيح ✅" ? (
                 <button
                   disabled
                   aria-label="انتهى وقت التعديل"

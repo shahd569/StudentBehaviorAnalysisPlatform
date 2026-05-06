@@ -29,7 +29,7 @@ const LogoutButton = () => {
         fontSize: "20px",
         fontWeight: "400 ",
         width: "200px",
-        marginTop: "80px",
+        marginTop: "50px",
       }}
     >
       <FontAwesomeIcon

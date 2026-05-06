@@ -27,12 +27,40 @@ export async function GET(req, { params }) {
     },
   });
 
-  const submissions = await prisma.assignmentSubmission.findMany({
-    where: { studentId: id },
-    include: { assignment: true },
+  const allAssignments = await prisma.assignment.findMany({
+    where: {
+      lesson: {
+        course: {
+          enrollments: {
+            studentId: id,
+          },
+        },
+      },
+    },
   });
 
-  const comments = submissions.map((s) => s.teacherComment).filter((c) => c); // حذف القيم الفارغة
+  // فقط الواجبات المنتهية
+  const finishedAssignments = allAssignments.filter(
+    (a) => new Date(a.deliveryDate) < new Date(),
+  );
+
+  // الواجبات التي سلمها الطالب
+  const studentSubmissions = await prisma.assignmentSubmission.findMany({
+    where: { studentId: id },
+  });
+
+  // عدد الواجبات التي سلمها من المنتهية
+  const submittedFinished = studentSubmissions.filter((s) =>
+    finishedAssignments.some((a) => a.id === s.assignmentId),
+  );
+
+  // المعدل الصحيح
+  const assignment_completion_rate =
+    submittedFinished.length / (finishedAssignments.length || 1);
+
+  const comments = studentSubmissions
+    .map((s) => s.teacherComment)
+    .filter((c) => c); // حذف القيم الفارغة
 
   let sentiment = 0;
 
@@ -113,12 +141,6 @@ export async function GET(req, { params }) {
     attempts.reduce((sum, a) => sum + (a.score || 0), 0) /
     (attempts.length || 1);
 
-  const onTime = submissions.filter(
-    (s) => s.submittedAt <= s.assignment.deliveryDate,
-  ).length;
-
-  const assignment_on_time_rate = onTime / (submissions.length || 1);
-
   const login_frequency = session_count;
 
   const behaviorRes = await fetch("http://localhost:5000/predict-behavior", {
@@ -147,7 +169,7 @@ export async function GET(req, { params }) {
     body: JSON.stringify({
       features: [
         avg_grade,
-        assignment_on_time_rate,
+        assignment_completion_rate,
         login_frequency,
         behavior_risk,
         sentiment,
@@ -157,60 +179,229 @@ export async function GET(req, { params }) {
 
   const final_status = (await finalRes.json()).final_status;
 
-  //  توصيات عامة
+  // اكتشاف المشاكل
 
-  const recommendations = [];
+  const detectedProblems = [];
 
-  if (final_status === 2)
-    recommendations.push("⚠️ أنت في خطر، يجب عليك مراجعة الدروس");
+  if (final_status === 2) detectedProblems.push("AT_RISK");
 
-  if (avg_grade < 50) recommendations.push("📉 درجاتك منخفضة");
+  if (avg_grade < 50) detectedProblems.push("LOW_PERFORMANCE");
 
-  if (login_frequency < 3) recommendations.push("📅 دخولك قليل للمنصة");
+  if (behavior_risk === 2 || completion_rate < 0.5)
+    detectedProblems.push("LOW_ENGAGEMENT");
 
-  if (recommendations.length === 0) recommendations.push("✅ أداؤك جيد");
+  if (login_frequency < 3) detectedProblems.push("LOW_ACTIVITY");
+
+  if (assignment_completion_rate < 0.5)
+    detectedProblems.push("MISSING_ASSIGNMENTS");
+
+  if (sentiment === -1) detectedProblems.push("NEGATIVE_FEEDBACK");
+
+  // توصيات مركبة
+
+  const advancedRecommendations = [];
+
+  //  خطر + ضعف أداء
+  if (
+    detectedProblems.includes("AT_RISK") &&
+    detectedProblems.includes("LOW_PERFORMANCE")
+  ) {
+    advancedRecommendations.push(
+      "🚨 أنت معرض للرسوب بسبب ضعف أدائك. ابدأ فورًا بمراجعة الدروس.",
+    );
+  }
+
+  //  خطر + ضعف تفاعل
+  if (
+    detectedProblems.includes("AT_RISK") &&
+    detectedProblems.includes("LOW_ENGAGEMENT")
+  ) {
+    advancedRecommendations.push(
+      "🚨 تفاعلك ضعيف وهذا يضعك في خطر. شاهد الفيديوهات كاملة بدون تخطي ثم طبق ما تعلمته.",
+    );
+  }
+
+  //  أداء ضعيف + تفاعل ضعيف
+  if (
+    detectedProblems.includes("LOW_PERFORMANCE") &&
+    detectedProblems.includes("LOW_ENGAGEMENT")
+  ) {
+    advancedRecommendations.push(
+      "📉 ضعف درجاتك مرتبط بعدم إكمال الفيديوهات. ركّز على مشاهدة الدروس كاملة .",
+    );
+  }
+
+  //  واجبات + أداء ضعيف
+  if (
+    detectedProblems.includes("MISSING_ASSIGNMENTS") &&
+    detectedProblems.includes("LOW_PERFORMANCE")
+  ) {
+    advancedRecommendations.push(
+      "📚 عدم تسليم الواجبات يؤثر على درجاتك. ابدأ بحل الواجبات فورًا لتحسين مستواك.",
+    );
+  }
+
+  //  نشاط قليل + خطر
+  if (
+    detectedProblems.includes("LOW_ACTIVITY") &&
+    detectedProblems.includes("AT_RISK")
+  ) {
+    advancedRecommendations.push(
+      "📅 قلة دخولك للمنصة سبب رئيسي في تراجعك. التزم بالدخول يوميًا لمتابعة الدروس.",
+    );
+  }
+
+  //  تعليقات سلبية + أداء ضعيف
+  if (
+    detectedProblems.includes("NEGATIVE_FEEDBACK") &&
+    detectedProblems.includes("LOW_PERFORMANCE")
+  ) {
+    advancedRecommendations.push(
+      "💬 ملاحظات المدرس تشير لضعف أدائك. اقرأ التعليقات وطبقها لتحسين نتائجك.",
+    );
+  }
+
+  //  ترتيب الأولوية
+
+  const priorityOrder = [
+    "AT_RISK",
+    "LOW_PERFORMANCE",
+    "LOW_ENGAGEMENT",
+    "MISSING_ASSIGNMENTS",
+    "LOW_ACTIVITY",
+    "NEGATIVE_FEEDBACK",
+  ];
+
+  detectedProblems.sort(
+    (a, b) => priorityOrder.indexOf(a) - priorityOrder.indexOf(b),
+  );
+
+  // بنك التوصيات
+
+  const recommendationBank = {
+    AT_RISK: [
+      "🚨 أنت معرض للرسوب. ابدأ فورًا بخطة دراسة يومية وركز على الدروس الأساسية.",
+      "⚠️ وضعك حرج. راجع الفيديوهات غير المكتملة ثم حل الاختبارات.",
+    ],
+
+    LOW_PERFORMANCE: [
+      "📉 درجاتك منخفضة. راجع حلول الاختبارات السابقة لفهم الأخطاء.",
+      "📘 راجع الدروس المرتبطة بالاختبارات ودوّن ملاحظاتك.",
+    ],
+
+    LOW_ENGAGEMENT: [
+      "🎥 لا تكمل الفيديوهات. حاول مشاهدة الدروس كاملة بدون تخطي.",
+      "👀 ركّز أثناء المشاهدة وابتعد عن المشتتات.",
+    ],
+
+    LOW_ACTIVITY: [
+      "📅 دخولك قليل. خصص وقت يومي ثابت للدراسة.",
+      "⏰ حاول الدخول للمنصة بشكل منتظم لتجنب تراكم الدروس.",
+    ],
+
+    MISSING_ASSIGNMENTS: [
+      "📚 لم تسلم الواجبات. ابدأ بحل الواجبات المطلوبة.",
+      "📝 حل الواجبات يساعدك على فهم الدروس بشكل أفضل.",
+    ],
+
+    NEGATIVE_FEEDBACK: [
+      "💬 راجع تعليقات المدرس وطبّق الملاحظات.",
+      "📢 حسّن أداءك بناءً على ملاحظات المدرس.",
+    ],
+  };
+
+  //  اختيار التوصيات
+
+  let recommendations = [];
+
+  //  التوصيات المركبة
+  recommendations.push(...advancedRecommendations);
+
+  //  التوصيات العادية
+  detectedProblems.forEach((problem) => {
+    const options = recommendationBank[problem];
+
+    if (options && options.length > 0) {
+      const randomIndex = Math.floor(Math.random() * options.length);
+      recommendations.push(options[randomIndex]);
+    }
+  });
+
+  recommendations = [...new Set(recommendations)];
+
+  recommendations = recommendations.slice(0, 5);
+
+  if (recommendations.length === 0) {
+    recommendations.push("✅ أداؤك جيد، استمر بنفس المستوى.");
+  }
 
   //  توصيات حسب الدروس
 
-  const lessonMap = {};
+  // const lessonMap = {};
 
-  interactions.forEach((i) => {
-    const lesson = i.video?.lesson;
-    if (!lesson) return;
+  // interactions.forEach((i) => {
+  //   const lesson = i.video?.lesson;
+  //   if (!lesson) return;
 
-    if (!lessonMap[lesson.id]) {
-      lessonMap[lesson.id] = {
-        name: lesson.title,
-        interactions: [],
-      };
-    }
+  //   if (!lessonMap[lesson.id]) {
+  //     lessonMap[lesson.id] = {
+  //       name: lesson.title,
+  //       interactions: [],
+  //     };
+  //   }
 
-    lessonMap[lesson.id].interactions.push(i);
-  });
+  //   lessonMap[lesson.id].interactions.push(i);
+  // });
 
-  const lessonRecommendations = [];
+  // const lessonRecommendations = [];
 
-  for (const lessonId in lessonMap) {
-    const data = lessonMap[lessonId].interactions;
-    const name = lessonMap[lessonId].name;
+  // for (const lessonId in lessonMap) {
+  //   const data = lessonMap[lessonId].interactions;
+  //   const name = lessonMap[lessonId].name;
 
-    const pauses = data.filter((i) => i.interactionType === "PAUSE").length;
-    const rewinds = data.filter((i) => i.interactionType === "SEEK").length;
+  //   const pauses = data.filter((i) => i.interactionType === "PAUSE").length;
+  //   const rewinds = data.filter((i) => i.interactionType === "SEEK").length;
 
-    const recs = [];
+  //   const totalWatch = data.reduce(
+  //     (sum, i) => sum + (i.currentTimeSeconds || 0),
+  //     0,
+  //   );
 
-    if (pauses > 5) recs.push(`⏸️ في درس "${name}" تتوقف كثيرًا`);
+  //   const avgWatch = totalWatch / (data.length || 1);
 
-    if (rewinds > 3) recs.push(`🔁 في درس "${name}" تعيد المشاهدة كثيرًا`);
+  //   const recs = [];
 
-    if (recs.length === 0) recs.push(`✅ أداؤك جيد في "${name}"`);
+  //   if (pauses > 5) {
+  //     recs.push(
+  //       `⏸️ في درس "${name}" تتوقف كثيرًا → حاول مشاهدة الدرس في بيئة هادئة بدون مقاطعة.`,
+  //     );
+  //   }
 
-    lessonRecommendations.push({
-      lessonName: name,
-      recommendations: recs,
-    });
-  }
+  //   if (rewinds > 3) {
+  //     recs.push(
+  //       `🔁 في درس "${name}" تعيد المشاهدة كثيرًا → هذا يعني أن الدرس صعب، حاول كتابة ملاحظات أو إعادة شرحه بنفسك.`,
+  //     );
+  //   }
 
+  //   if (avgWatch < 20) {
+  //     recs.push(
+  //       `👀 في درس "${name}" وقت المشاهدة قليل → حاول إكمال الفيديو للنهاية لفهم المحتوى.`,
+  //     );
+  //   }
+
+  //   if (pauses === 0 && rewinds === 0 && avgWatch > 50) {
+  //     recs.push(`👏 في درس "${name}" تفاعلك ممتاز — استمر بنفس الطريقة.`);
+  //   }
+
+  //   if (recs.length === 0) {
+  //     recs.push(`📘 راجع درس "${name}" مرة أخرى للتأكد من فهمك الكامل.`);
+  //   }
+
+  //   lessonRecommendations.push({
+  //     lessonName: name,
+  //     recommendations: recs,
+  //   });
+  // }
   //  توصيات حسب الكويز
 
   const quizRecommendations = [];
@@ -218,24 +409,36 @@ export async function GET(req, { params }) {
   attempts.forEach((a) => {
     const quizName = a.quiz?.title || "اختبار";
 
-    if ((a.score || 0) < 50) {
-      quizRecommendations.push(`📉 أداؤك ضعيف في اختبار "${quizName}"`);
+    const score = a.score || 0;
+
+    if (score < 50) {
+      quizRecommendations.push(
+        `📉 نتيجتك في "${quizName}" ضعيفة → ارجع للدرس المرتبط به وراجع حل الأسئلة لفهم الأخطاء.`,
+      );
     }
 
-    if ((a.score || 0) > 80) {
-      quizRecommendations.push(`🌟 أداؤك ممتاز في اختبار "${quizName}"`);
+    if (score >= 50 && score < 80) {
+      quizRecommendations.push(
+        `📊 نتيجتك في "${quizName}" متوسطة → حاول مراجعة النقاط التي أخطأت بها لتحسين مستواك.`,
+      );
+    }
+
+    if (score >= 80) {
+      quizRecommendations.push(
+        `🌟 نتيجتك في "${quizName}" ممتازة — استمر بنفس الأداء.`,
+      );
     }
 
     if (a.finishTime && a.startTime) {
       const duration = (new Date(a.finishTime) - new Date(a.startTime)) / 1000;
 
       if (duration < 30) {
-        quizRecommendations.push(`⏱️ أنهيت اختبار "${quizName}" بسرعة كبيرة`);
+        quizRecommendations.push(
+          `⏱️ أنهيت "${quizName}" بسرعة كبيرة → تأكد أنك قرأت الأسئلة جيدًا قبل الإجابة.`,
+        );
       }
     }
   });
-
-  //  FINAL RESPONSE
 
   return Response.json({
     features: {

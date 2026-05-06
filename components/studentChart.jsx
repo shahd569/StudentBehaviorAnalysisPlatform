@@ -36,7 +36,7 @@ const AttendanceChart = () => {
 
   const chartData = apiResponse?.studentPerformanceInfo?.map((item) => ({
     name: item.courseName,
-    students: item.averageScore,
+    students: Number(item.averageScore),
   }));
 
   if (error || !Array.isArray(chartData) || chartData.length === 0) {
@@ -60,7 +60,7 @@ const AttendanceChart = () => {
       </h6>
 
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={chartData} barSize={20}>
+        <BarChart data={chartData} barSize={30} barCategoryGap={-10} barGap={0}>
           <CartesianGrid
             strokeDasharray="3 3"
             vertical={false}
@@ -72,6 +72,7 @@ const AttendanceChart = () => {
             axisLine={false}
             tick={{ fill: "#9ca3af" }}
             tickLine={false}
+            padding={{ left: 0, right: 0 }}
           />
 
           <YAxis

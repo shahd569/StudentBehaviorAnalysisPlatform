@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import useSWR from "swr";
 import BarChart from "@/components/studentChart";
 import RecentFeed from "@/components/RecentFeed";
+import ResultRecentFeed from "@/components/ResultRecentFeed";
 import ContentModal from "@/components/contentModal";
 import AnnouncementsModal from "@/components/Announcement";
 import TestModal from "@/components/testModal";
@@ -16,7 +17,7 @@ import Table from "@/components/SHomeTable";
 export default function TeacherDashboard() {
   return (
     <div
-      style={{ display: "flex", justifyContent: "space-between", gap: "40px" }}
+      style={{ display: "flex", justifyContent: "space-between", gap: "20px" }}
     >
       <div className=" d-flex gap-5 flex-column flex-md-row col-md-7">
         {/* left */}
@@ -45,21 +46,32 @@ export default function TeacherDashboard() {
         </div>
       </div>
       <div
-        className="flex flex-col gap-8 col-md-5"
-        style={{ backgroundColor: "#eee", padding: "40px" }}
+        className="col-md-5"
+        style={{
+          // backgroundColor: "#eee",
+          padding: "40px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "20px",
+        }}
       >
         <div
           style={{
             border: "3px solid #5194F8",
             borderRadius: "20px",
             height: "150px",
-            marginBottom: "20px",
+            // marginBottom: "20px",
           }}
         >
           {/* <Image></Image> */}
           <p>مرحباً بعودتك شهد</p>
         </div>
-        <RecentFeed></RecentFeed>
+        <div>
+          <RecentFeed></RecentFeed>
+        </div>
+        <div>
+          <ResultRecentFeed></ResultRecentFeed>
+        </div>
       </div>
     </div>
   );

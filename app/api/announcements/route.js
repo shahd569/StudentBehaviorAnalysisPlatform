@@ -73,6 +73,7 @@ export async function POST(req) {
           content: `قام الأستاذ بنشر إعلان جديد بخصوص ${content}`,
           title: `إعلان جديد: ${title}`,
           isRead: false,
+          announcementId: newAnnouncement.id,
         })),
       });
     }
