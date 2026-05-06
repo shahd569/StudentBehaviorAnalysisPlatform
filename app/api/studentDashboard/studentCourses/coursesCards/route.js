@@ -5,7 +5,6 @@ import { authOptions } from "@/lib/auth";
 
 export async function GET() {
   try {
-    const sssion = await getServerSession(authOptions);
     // const session = getServerSession(authOptions);
     // if (!session || !session.user || session.user.role !== "STUDENT") {
     //   return NextResponse.json(
@@ -64,6 +63,7 @@ export async function GET() {
           instructorName: `${enrollment.course.instructor.firstName} ${enrollment.course.instructor.lastName}`,
           instructorProfilePictureUrl:
             enrollment.course.instructor.profilePictureUrl,
+          coursePictureUrl: enrollment.course.coursePictureUrl ?? null,
           videosCount: totalVideos,
           lessonsCount: enrollment.course._count.lessons,
           // lessonsDetails: lessonsWithVideoCount,
