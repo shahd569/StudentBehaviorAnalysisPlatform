@@ -1,6 +1,6 @@
 /* @import "tailwindcss"; */
 @import "bootstrap/dist/css/bootstrap.min.css";
-
+@import "plyr/dist/plyr.css";
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -48,4 +48,19 @@ body {
 
 .modal-header {
   border: none;
+}
+
+.plyr {
+  width: 100% !important;
+}
+
+.plyr__video-wrapper {
+  aspect-ratio: 16 / 9 !important;
+  background: black !important;
+}
+
+.plyr video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
 }

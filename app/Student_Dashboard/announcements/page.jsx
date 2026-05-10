@@ -139,7 +139,7 @@ export default function Announcement() {
                   (e.currentTarget.style.transform = "scale(1)")
                 }
               >
-                مرفق <FontAwesomeIcon icon={faPaperclip} />
+                <FontAwesomeIcon icon={faPaperclip} />
               </a>
             )}
 
@@ -173,7 +173,7 @@ export default function Announcement() {
                 style={{
                   marginBottom: "6px",
                   fontWeight: "700",
-                  fontSize: "22px",
+                  fontSize: "18px",
                   // color: "#6E6E6E",
                 }}
               >
@@ -184,7 +184,7 @@ export default function Announcement() {
               <p
                 style={{
                   color: "#6E6E6E",
-                  fontSize: "18px",
+                  fontSize: "14px",
                   marginBottom: "10px",
                 }}
               >
@@ -197,7 +197,7 @@ export default function Announcement() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "flex-start",
-                  gap: "60px",
+                  gap: "150px",
                   fontSize: "14px",
                   color: "#6E6E6E",
                 }}

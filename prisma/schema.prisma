@@ -289,6 +289,8 @@ enum TypeOfVideoInteraction {
   RATE_CHANGE
   PAUSE
   SEEK
+  FORWARD
+  REWIND
 }
 
 enum SessionStatus {

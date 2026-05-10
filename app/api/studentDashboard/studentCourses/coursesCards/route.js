@@ -21,6 +21,7 @@ export async function GET() {
           select: {
             id: true,
             courseName: true,
+            coursePictureUrl: true,
             instructor: {
               select: {
                 firstName: true,
@@ -59,6 +60,7 @@ export async function GET() {
         );
 
         return {
+          id: enrollment.course.id,
           courseName: enrollment.course.courseName,
           instructorName: `${enrollment.course.instructor.firstName} ${enrollment.course.instructor.lastName}`,
           instructorProfilePictureUrl:

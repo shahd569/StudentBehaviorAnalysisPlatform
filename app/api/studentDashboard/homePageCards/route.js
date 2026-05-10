@@ -46,7 +46,12 @@ export async function GET() {
         select: { score: true },
       }),
       prisma.UserSession.findMany({
-        where: { studentId: studentId },
+        where: {
+          studentId: studentId,
+          startTime: {
+            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+          },
+        },
         select: { startTime: true, endTime: true, status: true },
       }),
     ]);

@@ -4,6 +4,7 @@ import "./globals.css";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "plyr/dist/plyr.css";
 
 config.autoAddCss = false;
 
