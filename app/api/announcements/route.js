@@ -2,10 +2,31 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import path from "path";
 import { writeFile } from "fs/promises";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function POST(req) {
   try {
     const formData = await req.formData();
+
+    // التحقق من أن المستخدم معلم
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== "TEACHER") {
+      return NextResponse.json(
+        { message: "غير مسموح لك بإنشاء إعلانات" },
+        { status: 401 },
+      );
+    }
+
+    // جلب بيانات المعلم الكاملة
+    const teacher = await prisma.Users.findUnique({
+      where: { id: parseInt(session.user.id) },
+      select: { firstName: true, lastName: true },
+    });
+
+    const teacherName = teacher
+      ? `${teacher.firstName} ${teacher.lastName}`
+      : "الأستاذ";
 
     const title = formData.get("title")?.toString() || "";
     const content = formData.get("content")?.toString() || "";
@@ -70,8 +91,8 @@ export async function POST(req) {
           userId: id,
           alertType: "ANNOUNCEMENT",
           triggerReason: "NEW_CONTENT",
-          content: `قام الأستاذ بنشر إعلان جديد بخصوص ${content}`,
-          title: `إعلان جديد: ${title}`,
+          content: `قام المدرّس/ة ${teacherName} بنشر إعلان جديد بخصوص ${content}`,
+          title: `إعلان جديد من ${teacherName}: ${title}`,
           isRead: false,
           announcementId: newAnnouncement.id,
         })),

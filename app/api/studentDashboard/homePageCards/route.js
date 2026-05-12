@@ -69,7 +69,7 @@ export async function GET() {
     // performance avg
     let assignmentScoreSum = 0;
     let assignmentCount = 0;
-    const assignment = studentAssignmentSubmissions.map((a) => {
+    studentAssignmentSubmissions.forEach((a) => {
       if (a.finalScore != null) {
         assignmentScoreSum += a.finalScore;
         assignmentCount++;
@@ -78,7 +78,7 @@ export async function GET() {
     const assignmentAvg = assignmentScoreSum / assignmentCount;
     let quizScoreSum = 0;
     let quizCount = 0;
-    const quizzes = allQuizAttempt.map((q) => {
+    allQuizAttempt.forEach((q) => {
       if (q.score != null) {
         quizScoreSum += q.score;
         quizCount++;
@@ -88,19 +88,41 @@ export async function GET() {
     const performanceAvg = (assignmentAvg + quizAvg) / 2;
 
     // learning hours
-    const totalLearningHours = userSessions.reduce((total, session) => {
-      if (session.status === "ENDED") {
-        const duration =
-          (new Date(session.endTime) - new Date(session.startTime)) /
-          (1000 * 60 * 60);
-        return total + duration;
+    const validSessions = userSessions
+      .filter((session) => session.status === "ENDED")
+      .map((session) => ({
+        start: new Date(session.startTime).getTime(),
+        end: new Date(session.endTime).getTime(),
+      }))
+      .filter(
+        (interval) =>
+          !Number.isNaN(interval.start) &&
+          !Number.isNaN(interval.end) &&
+          interval.end > interval.start,
+      )
+      .sort((a, b) => a.start - b.start);
+
+    const mergedIntervals = [];
+    for (const interval of validSessions) {
+      const last = mergedIntervals[mergedIntervals.length - 1];
+      if (!last || interval.start > last.end) {
+        mergedIntervals.push({ ...interval });
+      } else {
+        last.end = Math.max(last.end, interval.end);
       }
-      return total;
-    }, 0);
+    }
+
+    const totalLearningHours = mergedIntervals.reduce(
+      (total, interval) =>
+        total + (interval.end - interval.start) / (1000 * 60 * 60),
+      0,
+    );
+
+    const cappedTotalHours = Math.min(totalLearningHours, 168);
 
     let learningHours;
-    const hours = Math.floor(totalLearningHours);
-    const minutes = Math.round((totalLearningHours - hours) * 60);
+    const hours = Math.floor(cappedTotalHours);
+    const minutes = Math.round((cappedTotalHours - hours) * 60);
     if (hours > 0) {
       learningHours = `${hours}h`;
     } else {

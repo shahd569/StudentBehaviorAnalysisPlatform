@@ -13,8 +13,14 @@ import PerformanceChart from "@/components/performanceChart";
 import Image from "next/image";
 import Cards from "@/components/studentUsercard";
 import Table from "@/components/SHomeTable";
+import { useSession } from "next-auth/react";
 
 export default function TeacherDashboard() {
+  const { data: session } = useSession();
+  const userName = session?.user?.firstName
+    ? `${session.user.firstName}`.trim()
+    : session?.user?.name || "زائر";
+
   return (
     <div
       style={{ display: "flex", justifyContent: "space-between", gap: "20px" }}
@@ -59,12 +65,38 @@ export default function TeacherDashboard() {
           style={{
             border: "3px solid #5194F8",
             borderRadius: "20px",
-            height: "150px",
+            height: "100px",
             // marginBottom: "20px",
+            display: "flex",
+            flexDirection: "row-reverse",
+            overflow: "visible",
           }}
         >
-          {/* <Image></Image> */}
-          <p>مرحباً بعودتك شهد</p>
+          <Image
+            src="/uploads/welcome-card.png"
+            width={200}
+            height={240}
+            alt=""
+            style={{
+              alignItems: "flex-end",
+              top: "10px",
+              paddingLeft: "20px",
+              paddingBottom: "105px",
+              position: "relative",
+              top: "-40px",
+            }}
+          />
+          <p
+            style={{
+              fontWeight: "bold",
+              fontSize: "24px",
+              alignContent: "center",
+              paddingLeft: "60px",
+              color: "#5194F8",
+            }}
+          >
+            مرحباً بعودتك {userName}
+          </p>
         </div>
         <div>
           <RecentFeed></RecentFeed>
