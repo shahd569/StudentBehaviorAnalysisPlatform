@@ -1,26 +1,35 @@
-import pickle
+# import pickle
+import joblib
 import numpy as np
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
 # تحميل النماذج
-behavior_model = pickle.load(open("behavior_model.pkl", "rb"))
-sentiment_model = pickle.load(open("sentiment_model.pkl", "rb"))
-final_model = pickle.load(open("final_model.pkl", "rb"))
+behavior_model = joblib.load("behavior_model.pkl")
+sentiment_model = joblib.load("sentiment_model.pkl")
+final_model = joblib.load("final_model.pkl")
 
 # -----------------------------------
 # 🧠 1. Behavior Model
 # -----------------------------------
 @app.route("/predict-behavior", methods=["POST"])
 def predict_behavior():
-    data = request.json["features"]
-
-    prediction = behavior_model.predict([data])
-
-    return jsonify({
-        "risk": int(prediction[0])
-    })
+    try:
+        data = request.json["features"]
+        
+        # التأكد من أن البيانات مصفوفة
+        if not isinstance(data, list):
+            data = [data]
+        
+        prediction = behavior_model.predict([data])
+        
+        return jsonify({
+            "risk": int(prediction[0])
+        })
+    except Exception as e:
+        print(f"Behavior prediction error: {str(e)}")
+        return jsonify({"error": str(e)}), 400
 
 
 # -----------------------------------
@@ -28,13 +37,23 @@ def predict_behavior():
 # -----------------------------------
 @app.route("/predict-sentiment", methods=["POST"])
 def predict_sentiment():
-    text = request.json["text"]
-
-    prediction = sentiment_model.predict([text])
-
-    return jsonify({
-        "sentiment": int(prediction[0])
-    })
+    try:
+        text = request.json["text"]
+        
+        if isinstance(text, list):
+            text = " ".join(text)
+        
+        if not isinstance(text, str):
+            text = str(text)
+        
+        prediction = sentiment_model.predict([text])
+        
+        return jsonify({
+            "sentiment": int(prediction[0])
+        })
+    except Exception as e:
+        print(f"Sentiment prediction error: {str(e)}")
+        return jsonify({"error": str(e)}), 400
 
 
 # -----------------------------------
@@ -42,13 +61,21 @@ def predict_sentiment():
 # -----------------------------------
 @app.route("/predict-final", methods=["POST"])
 def predict_final():
-    data = request.json["features"]
-
-    prediction = final_model.predict([data])
-
-    return jsonify({
-        "final_status": int(prediction[0])
-    })
+    try:
+        data = request.json["features"]
+        
+        # التأكد من أن البيانات مصفوفة
+        if not isinstance(data, list):
+            data = [data]
+        
+        prediction = final_model.predict([data])
+        
+        return jsonify({
+            "final_status": int(prediction[0])
+        })
+    except Exception as e:
+        print(f"Final prediction error: {str(e)}")
+        return jsonify({"error": str(e)}), 400
 
 
 # تشغيل السيرفر

@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET(req, { params }) {
   const { studentId } = await params;
   const id = parseInt(studentId);
-
+  console.log("studentId:", id);
   // جلب البيانات
   const interactions = await prisma.videoInteraction.findMany({
     where: { studentId: id },
@@ -32,7 +32,9 @@ export async function GET(req, { params }) {
       lesson: {
         course: {
           enrollments: {
-            studentId: id,
+            some: {
+              studentId: id,
+            },
           },
         },
       },
@@ -65,16 +67,26 @@ export async function GET(req, { params }) {
   let sentiment = 0;
 
   if (comments.length > 0) {
-    const res = await fetch("http://localhost:5000/predict-sentiment", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        text: comments.join(" "),
-      }),
-    });
+    try {
+      const res = await fetch("http://127.0.0.1:5000/predict-sentiment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: comments.join(" "),
+        }),
+      });
 
-    const data = await res.json();
-    sentiment = data.sentiment;
+      if (!res.ok) {
+        console.error("Sentiment API error:", res.status, res.statusText);
+        sentiment = 0;
+      } else {
+        const data = await res.json();
+        sentiment = data.sentiment || 0;
+      }
+    } catch (error) {
+      console.error("Sentiment prediction failed:", error);
+      sentiment = 0;
+    }
   }
   //  Features
 
@@ -143,41 +155,71 @@ export async function GET(req, { params }) {
 
   const login_frequency = session_count;
 
-  const behaviorRes = await fetch("http://localhost:5000/predict-behavior", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      features: [
-        watch_time_ratio,
-        pause_count,
-        rewind_count,
-        speed_change_count,
-        early_exit,
-        session_count,
-        avg_watch_time,
-        completion_rate,
-        engagement_score,
-      ],
-    }),
-  });
+  let behavior_risk = 0;
 
-  const behavior_risk = (await behaviorRes.json()).risk;
+  try {
+    const behaviorRes = await fetch("http://127.0.0.1:5000/predict-behavior", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        features: [
+          watch_time_ratio,
+          pause_count,
+          rewind_count,
+          speed_change_count,
+          early_exit,
+          session_count,
+          avg_watch_time,
+          completion_rate,
+          engagement_score,
+        ],
+      }),
+    });
 
-  const finalRes = await fetch("http://localhost:5000/predict-final", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      features: [
-        avg_grade,
-        assignment_completion_rate,
-        login_frequency,
-        behavior_risk,
-        sentiment,
-      ],
-    }),
-  });
+    if (!behaviorRes.ok) {
+      console.error(
+        "Behavior API error:",
+        behaviorRes.status,
+        behaviorRes.statusText,
+      );
+      behavior_risk = 0;
+    } else {
+      const data = await behaviorRes.json();
+      behavior_risk = data.risk || 0;
+    }
+  } catch (error) {
+    console.error("Behavior prediction failed:", error);
+    behavior_risk = 0;
+  }
 
-  const final_status = (await finalRes.json()).final_status;
+  let final_status = 0;
+
+  try {
+    const finalRes = await fetch("http://127.0.0.1:5000/predict-final", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        features: [
+          avg_grade,
+          assignment_completion_rate,
+          login_frequency,
+          behavior_risk,
+          sentiment,
+        ],
+      }),
+    });
+
+    if (!finalRes.ok) {
+      console.error("Final API error:", finalRes.status, finalRes.statusText);
+      final_status = 0;
+    } else {
+      const data = await finalRes.json();
+      final_status = data.final_status || 0;
+    }
+  } catch (error) {
+    console.error("Final prediction failed:", error);
+    final_status = 0;
+  }
 
   // اكتشاف المشاكل
 
@@ -452,7 +494,8 @@ export async function GET(req, { params }) {
       completion_rate,
       engagement_score,
       avg_grade,
-      assignment_on_time_rate,
+      // assignment_on_time_rate,
+      assignment_completion_rate,
       login_frequency,
     },
     ai: {
@@ -461,7 +504,7 @@ export async function GET(req, { params }) {
       final_status,
     },
     generalRecommendations: recommendations,
-    lessonRecommendations,
+    // lessonRecommendations,
     quizRecommendations,
   });
 }

@@ -5,6 +5,7 @@ import Table from "@/components/completedQuizzes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Cards from "@/components/quizCards/QuizCards";
 
 export default function Quiz() {
@@ -18,6 +19,13 @@ export default function Quiz() {
   const [availableQuizzes, setAvailableQuizzes] = useState([]);
   const [filteredAvailable, setFilteredAvailable] = useState([]);
 
+  const searchParams = useSearchParams();
+
+  const activeTab =
+    searchParams.get("tab") === "available" ? "second" : "first";
+
+  const lessonId = Number(searchParams.get("lessonId"));
+
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
@@ -26,8 +34,9 @@ export default function Quiz() {
 
         const res2 = await fetch("/api/studentDashboard/quizzes/available");
         const data2 = await res2.json();
-
+        console.log(data2);
         setAvailableQuizzes(data2.quizzes || []);
+        console.log("filtered result:", data2.quizzes || []);
         setFilteredAvailable(data2.quizzes || []);
 
         if (res.ok) {
@@ -83,6 +92,13 @@ export default function Quiz() {
   }, [searchQuery, allQuizzes, statusFilter, objectFilter]);
   useEffect(() => {
     let result = availableQuizzes;
+    // console.log("courseId from url:", courseId);
+
+    if (lessonId) {
+      result = result.filter(
+        (quiz) => Number(quiz.lessonId) === Number(lessonId),
+      );
+    }
 
     if (searchQuery) {
       result = result.filter((a) =>
@@ -99,8 +115,16 @@ export default function Quiz() {
     }
 
     setFilteredAvailable(result);
-  }, [searchQuery, statusFilter, objectFilter, availableQuizzes]);
+  }, [searchQuery, statusFilter, objectFilter, availableQuizzes, lessonId]);
 
+  console.log("lessonId from url:", lessonId);
+
+  console.log("availableQuizzes:", availableQuizzes);
+
+  availableQuizzes.forEach((quiz) => {
+    console.log("quiz object:", quiz);
+    console.log("lessonId:", quiz.lessonId);
+  });
   return (
     <div
       style={{
@@ -112,7 +136,7 @@ export default function Quiz() {
       }}
     >
       <h1 style={{ fontWeight: "bold" }}>الاختبارات</h1>
-      <Tab.Container defaultActiveKey="first">
+      <Tab.Container defaultActiveKey={activeTab}>
         <Nav
           variant="tabs"
           style={{

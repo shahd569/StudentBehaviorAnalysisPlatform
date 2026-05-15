@@ -62,6 +62,8 @@ export async function GET() {
 
       return {
         id: q.id,
+        courseId: q.lesson.course.id,
+        lessonId: q.lessonId,
         title: q.title,
         courseName: q.lesson.course.courseName,
         maxScore: q.maxScore,

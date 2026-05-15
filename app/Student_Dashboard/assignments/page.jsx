@@ -5,6 +5,7 @@ import Table from "@/components/complitedAssignment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Cards from "@/components/assignmentCards/AssignmentCards";
 
 export default function Assignment() {
@@ -18,6 +19,12 @@ export default function Assignment() {
   const [availableAssignments, setAvailableAssignments] = useState([]);
   const [filteredAvailable, setFilteredAvailable] = useState([]);
 
+  const searchParams = useSearchParams();
+
+  const activeTab =
+    searchParams.get("tab") === "available" ? "second" : "first";
+
+  const lessonId = Number(searchParams.get("lessonId"));
   useEffect(() => {
     const fetchAssignments = async () => {
       try {
@@ -90,7 +97,12 @@ export default function Assignment() {
 
   useEffect(() => {
     let result = availableAssignments;
-
+    // فلترة حسب المقرر
+    if (lessonId) {
+      result = result.filter(
+        (quiz) => Number(quiz.lessonId) === Number(lessonId),
+      );
+    }
     if (searchQuery) {
       result = result.filter((a) =>
         a.title.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -106,7 +118,7 @@ export default function Assignment() {
     }
 
     setFilteredAvailable(result);
-  }, [searchQuery, statusFilter, objectFilter, availableAssignments]);
+  }, [searchQuery, statusFilter, objectFilter, availableAssignments, lessonId]);
 
   return (
     <div
@@ -119,7 +131,7 @@ export default function Assignment() {
       }}
     >
       <h1 style={{ fontWeight: "bold" }}>الواجبات</h1>
-      <Tab.Container defaultActiveKey="first">
+      <Tab.Container defaultActiveKey={activeTab}>
         <Nav
           variant="tabs"
           style={{

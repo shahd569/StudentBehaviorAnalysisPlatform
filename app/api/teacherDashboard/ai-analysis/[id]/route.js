@@ -4,7 +4,7 @@ export async function GET(req, { params }) {
   const { id } = await params;
   const teacherId = parseInt(id);
 
-  //  جلب الطلاب
+  //  جلب الطلاب بدون تكرار اذا كانو مسجلين بأكتر من مادة لدى نفس المدرس
 
   const enrollments = await prisma.enrollment.findMany({
     where: {
@@ -12,6 +12,7 @@ export async function GET(req, { params }) {
         instructorId: teacherId,
       },
     },
+    distinct: ["studentId"],
     include: {
       student: true,
     },
@@ -274,7 +275,7 @@ export async function GET(req, { params }) {
 
   //  توصيات مركبة
 
-  if (highRisk.length > 0 && lowEngagement.length > 0) {
+  if (atRiskStudents.length > 0 && lowEngagement.length > 0) {
     teacherRecommendations.push(
       `🧠 الطلاب المعرضون للرسوب يعانون أيضًا من ضعف التفاعل → المشكلة ليست فقط أكاديمية بل سلوكية أيضًا.`,
     );
@@ -297,7 +298,7 @@ export async function GET(req, { params }) {
   //  توقع رسوب
   if (atRiskStudents.length > 0) {
     predictiveRecommendations.push(
-      `🚨 النظام يتوقع رسوب ${highRisk.length} طلاب إذا استمر الوضع الحالي.`,
+      `🚨 النظام يتوقع رسوب ${atRiskStudents.length} طلاب إذا استمر الوضع الحالي.`,
     );
   }
 

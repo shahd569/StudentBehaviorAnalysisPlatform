@@ -58,6 +58,8 @@ export async function GET() {
       return {
         id: a.id,
         title: a.title,
+        lessonId: a.lessonId,
+        courseId: a.lesson.course.id,
         courseName: a.lesson.course.courseName,
         endDate: a.deliveryDate
           ? a.deliveryDate.toISOString().split("T")[0]

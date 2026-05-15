@@ -38,6 +38,7 @@ export async function GET(request, { params }) {
     });
     const lessonInfo = lectures.map((lecture) => {
       return {
+        id: lecture.id,
         lessonTitle: lecture.title,
         lessonSequenceNumber: lecture.sequenceNumber,
         lessonFileUrl:

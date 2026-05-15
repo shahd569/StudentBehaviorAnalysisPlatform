@@ -106,7 +106,14 @@ export default function ActivityTracker({
       }
     };
 
+    // دالة التعامل مع إشارة الفيديو
+    const handleVideoHeartbeat = () => {
+      resetInactivityTimer(); // إعادة ضبط مؤقت الـ 15 دقيقة
+    };
+
     // إضافة المتنصتات للنافذة
+    // التنصت على حدث مخصص يأتي من مشغل الفيديو
+    window.addEventListener("video-active", handleVideoHeartbeat);
     window.addEventListener("click", handleClick);
     window.addEventListener("mousemove", handleInteraction);
     window.addEventListener("keydown", handleInteraction); // لوحة المفاتيح أيضاً
@@ -118,6 +125,7 @@ export default function ActivityTracker({
       window.removeEventListener("click", handleClick);
       window.removeEventListener("mousemove", handleInteraction);
       window.removeEventListener("keydown", handleInteraction);
+      window.removeEventListener("video-active", handleVideoHeartbeat);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, [pathname]); // إعادة التشغيل عند كل تغيير في المسار
