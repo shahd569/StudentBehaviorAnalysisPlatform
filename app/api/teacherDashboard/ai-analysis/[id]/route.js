@@ -338,5 +338,6 @@ export async function GET(req, { params }) {
     },
     teacherRecommendations,
     predictiveRecommendations,
+    studentsCount: students.length,
   });
 }

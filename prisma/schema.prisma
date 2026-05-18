@@ -34,6 +34,16 @@ model Users {
   contactInfo          ContactInfo?
 }
 
+model PasswordReset {
+  id        Int      @id @default(autoincrement())
+  email     String
+  otp       String   //  الرمز الرقمي المكون من 4 أو 6 أرقام
+  expiresAt DateTime // وقت انتهاء الصلاحية 
+  createdAt DateTime @default(now())
+
+  @@index([email]) // لتسريع عملية البحث عن الرمز باستخدام الإيميل
+}
+
 model ContactInfo{
   id        Int    @id @default(autoincrement())
   userId    Int    @unique
