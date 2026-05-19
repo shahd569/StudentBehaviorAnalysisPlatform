@@ -140,14 +140,23 @@ export async function GET(req, { params }) {
     count++;
   });
 
-  const watch_time_ratio = totalRatio / (count || 1);
-  const completion_rate = completed / (count || 1);
-  const early_exit = earlyExit;
+  const watch_time_ratio = Math.min(totalRatio / (count || 1), 1);
+
+  const completion_rate = Math.min(completed / (count || 1), 1);
+
+  const normalizedPause = 1 / (pause_count + 1);
+
+  const early_exit = earlyExit / (count || 1);
+
+  //  Engagement Score
 
   const engagement_score =
-    completion_rate * 0.5 +
+    completion_rate * 0.4 +
     watch_time_ratio * 0.3 +
-    (1 / (pause_count + 1)) * 0.2;
+    normalizedPause * 0.2 +
+    (1 - early_exit) * 0.1;
+
+  const final_engagement_score = Math.max(0, Math.min(engagement_score, 1));
 
   const avg_grade =
     attempts.reduce((sum, a) => sum + (a.score || 0), 0) /
@@ -171,7 +180,7 @@ export async function GET(req, { params }) {
           session_count,
           avg_watch_time,
           completion_rate,
-          engagement_score,
+          final_engagement_score,
         ],
       }),
     });
@@ -219,6 +228,42 @@ export async function GET(req, { params }) {
   } catch (error) {
     console.error("Final prediction failed:", error);
     final_status = 0;
+  }
+
+  //  مستوى التفاعل
+
+  let engagementLevel = "";
+
+  if (final_engagement_score >= 0.7) {
+    engagementLevel = "🟢 مرتفع";
+  } else if (final_engagement_score >= 0.3) {
+    engagementLevel = "🟡 متوسط";
+  } else {
+    engagementLevel = "🔴 منخفض";
+  }
+
+  //  مستوى الخطر
+
+  let riskLevel = "";
+
+  if (behavior_risk === 2) {
+    riskLevel = "🔴 مرتفع";
+  } else if (behavior_risk === 1) {
+    riskLevel = "🟡 متوسط";
+  } else {
+    riskLevel = "🟢 منخفض";
+  }
+
+  //  توقع الأداء النهائي
+
+  let performancePrediction = "";
+
+  if (final_status === 2) {
+    performancePrediction = "🔴 متوقع رسوب الطالب";
+  } else if (final_status === 1) {
+    performancePrediction = "🟡 يحتاج تحسين";
+  } else {
+    performancePrediction = "🟢 متوقع نجاح الطالب";
   }
 
   // اكتشاف المشاكل
@@ -492,7 +537,7 @@ export async function GET(req, { params }) {
       session_count,
       avg_watch_time,
       completion_rate,
-      engagement_score,
+      final_engagement_score,
       avg_grade,
       // assignment_on_time_rate,
       assignment_completion_rate,
@@ -502,6 +547,11 @@ export async function GET(req, { params }) {
       behavior_risk,
       sentiment,
       final_status,
+    },
+    analysis: {
+      engagementLevel,
+      riskLevel,
+      performancePrediction,
     },
     generalRecommendations: recommendations,
     // lessonRecommendations,

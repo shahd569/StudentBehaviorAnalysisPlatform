@@ -3,6 +3,7 @@ import Table from "@/components/quizTable";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 
 export default function QuizTable() {
   const [quiz, setQuiz] = useState([]);
@@ -11,6 +12,9 @@ export default function QuizTable() {
   const [objectFilter, setObjectFilter] = useState("الكل");
   const [courses, setCourses] = useState([]);
   const [statusFilter, setStatusFilter] = useState("الكل");
+
+  const searchParams = useSearchParams();
+  const lessonId = Number(searchParams.get("lessonId"));
 
   // 🔹 جلب البيانات
   useEffect(() => {
@@ -38,6 +42,12 @@ export default function QuizTable() {
   //  الفلاتر
   useEffect(() => {
     let result = [...quiz];
+
+    if (lessonId) {
+      result = result.filter(
+        (quiz) => Number(quiz.lessonId) === Number(lessonId),
+      );
+    }
 
     if (searchQuery.trim() !== "") {
       result = result.filter((q) =>

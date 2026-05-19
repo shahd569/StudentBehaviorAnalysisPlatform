@@ -3,6 +3,7 @@ import Table from "@/components/AssignmentsTable";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 
 export default function AssignmentTable() {
   const [allAssignments, setAllAssignments] = useState([]);
@@ -10,6 +11,9 @@ export default function AssignmentTable() {
   const [searchQuery, setSearchQuery] = useState("");
   const [objectFilter, setObjectFilter] = useState("الكل");
   const [courses, setCourses] = useState([]);
+
+  const searchParams = useSearchParams();
+  const lessonId = Number(searchParams.get("lessonId"));
 
   // 🔹 جلب البيانات
   useEffect(() => {
@@ -37,6 +41,12 @@ export default function AssignmentTable() {
   useEffect(() => {
     let result = [...allAssignments];
 
+    if (lessonId) {
+      console.log(lessonId);
+      result = result.filter(
+        (assignment) => Number(assignment.lessonId) === Number(lessonId),
+      );
+    }
     // فلتر البحث
     if (searchQuery.trim() !== "") {
       result = result.filter((item) =>
@@ -50,7 +60,7 @@ export default function AssignmentTable() {
     }
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setDisplayedAssignments(result);
-  }, [searchQuery, objectFilter, allAssignments]);
+  }, [searchQuery, objectFilter, allAssignments, lessonId]);
 
   return (
     <div

@@ -23,6 +23,7 @@ export async function GET() {
       include: {
         lesson: {
           select: {
+            id: true,
             course: {
               select: {
                 courseName: true,
@@ -70,6 +71,7 @@ export async function GET() {
       return {
         id: quiz.id,
         title: quiz.title,
+        lessonId: quiz.lesson.id,
         courseName: quiz.lesson.course.courseName,
         duration: quiz.timeLimit ? `${quiz.timeLimit} دقيقة` : "مفتوح",
         totalStudents: totalStudents,

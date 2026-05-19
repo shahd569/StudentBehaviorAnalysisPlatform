@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
+import { id } from "zod/v4/locales";
 
 export async function GET() {
   try {
@@ -45,6 +46,7 @@ export async function GET() {
         return acc + (lesson._count?.videos || 0);
       }, 0);
       return {
+        id: c.id,
         courseName: c.courseName,
         coursePictureUrl: c.coursePictureUrl,
         lessonsCount: c._count.lessons,

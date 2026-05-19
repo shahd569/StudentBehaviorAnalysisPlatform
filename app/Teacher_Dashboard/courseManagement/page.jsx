@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import { useRouter } from "next/navigation";
 
 export default function Assignment() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const router = useRouter();
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -140,6 +142,11 @@ export default function Assignment() {
               }
               onMouseLeave={(e) =>
                 (e.currentTarget.style.background = "#9f04f8")
+              }
+              onClick={() =>
+                router.push(
+                  `/Teacher_Dashboard/courseManagement/${course.id}/corseDetails`,
+                )
               }
             >
               عرض المقرر

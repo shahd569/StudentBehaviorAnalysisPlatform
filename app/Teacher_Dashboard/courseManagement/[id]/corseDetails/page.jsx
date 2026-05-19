@@ -35,18 +35,13 @@ export default function CourseDetails() {
   const [courseInfo, setCourseInfo] = useState([]);
 
   const videoRef = useRef(null);
-  const lastTimeRef = useRef(0);
 
-  const [watchTime, setWatchTime] = useState(0);
-
-  const watchIntervalRef = useRef(null);
   const params = useParams();
 
   const courseId = Number(params.id);
   const router = useRouter();
-  // =========================================
+
   // جلب الدروس
-  // =========================================
 
   useEffect(() => {
     const fetchLessons = async () => {
@@ -72,9 +67,7 @@ export default function CourseDetails() {
     fetchLessons();
   }, [courseId]);
 
-  // =========================================
   // جلب معلومات المقرر
-  // =========================================
 
   useEffect(() => {
     const fetchInfo = async () => {
@@ -96,154 +89,9 @@ export default function CourseDetails() {
     fetchInfo();
   }, []);
 
-  // المقرر الحالي فقط
-
   const currentCourse = useMemo(() => {
     return courseInfo.find((c) => c.id === courseId);
   }, [courseInfo, courseId]);
-
-  // =========================================
-  // إرسال التفاعلات
-  // =========================================
-
-  const sendInteraction = async ({
-    interactionType,
-    currentTimeSeconds,
-    value = null,
-  }) => {
-    try {
-      const res = await fetch("/api/studentDashboard/videoInteractions", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          videoId: selectedVideo.videoId,
-          interactionType,
-          currentTimeSeconds,
-          value,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        console.error("Video interaction failed", res.status, data);
-      }
-      return data;
-    } catch (error) {
-      console.error("sendInteraction error", error);
-    }
-  };
-
-  useEffect(() => {
-    if (!selectedVideo) return;
-
-    let attachInterval = null;
-    let media = null;
-
-    const cleanup = () => {
-      if (!media) return;
-      media.removeEventListener("play", handlePlay);
-      media.removeEventListener("pause", handlePause);
-      media.removeEventListener("ratechange", handleRateChange);
-      media.removeEventListener("seeking", handleSeeking);
-      media.removeEventListener("seeked", handleSeeked);
-      media.removeEventListener("ended", handleEnded);
-      clearInterval(watchIntervalRef.current);
-    };
-
-    const handlePlay = () => {
-      sendInteraction({
-        interactionType: "PLAY",
-        currentTimeSeconds: Math.floor(media.currentTime),
-      });
-      window.dispatchEvent(new CustomEvent("video-active"));
-      clearInterval(watchIntervalRef.current);
-      watchIntervalRef.current = setInterval(() => {
-        setWatchTime((prev) => {
-          const newTime = prev + 1;
-          if (newTime % 30 === 0) {
-            window.dispatchEvent(new CustomEvent("video-active"));
-            console.log("Activity pulse sent: Student is still watching...");
-          }
-          return newTime;
-        });
-      }, 1000);
-    };
-
-    const handlePause = () => {
-      sendInteraction({
-        interactionType: "PAUSE",
-        currentTimeSeconds: Math.floor(media.currentTime),
-      });
-      clearInterval(watchIntervalRef.current);
-    };
-
-    const handleRateChange = () => {
-      sendInteraction({
-        interactionType: "RATE_CHANGE",
-        currentTimeSeconds: Math.floor(media.currentTime),
-        value: media.playbackRate,
-      });
-    };
-
-    const handleSeeking = () => {
-      lastTimeRef.current = media.currentTime;
-    };
-
-    const handleSeeked = () => {
-      const current = media.currentTime;
-      let type = "SEEK";
-      if (current > lastTimeRef.current) {
-        type = "FORWARD";
-      } else if (current < lastTimeRef.current) {
-        type = "REWIND";
-      }
-      sendInteraction({
-        interactionType: type,
-        currentTimeSeconds: Math.floor(current),
-      });
-    };
-
-    const handleEnded = () => {
-      sendInteraction({
-        interactionType: "STOP",
-        currentTimeSeconds: Math.floor(media.duration),
-      });
-      clearInterval(watchIntervalRef.current);
-    };
-
-    const attachListeners = () => {
-      const player = videoRef.current?.plyr || videoRef.current;
-      if (!player || !player.media) {
-        return false;
-      }
-      media = player.media;
-      media.addEventListener("play", handlePlay);
-      media.addEventListener("pause", handlePause);
-      media.addEventListener("ratechange", handleRateChange);
-      media.addEventListener("seeking", handleSeeking);
-      media.addEventListener("seeked", handleSeeked);
-      media.addEventListener("ended", handleEnded);
-      return true;
-    };
-
-    if (!attachListeners()) {
-      attachInterval = setInterval(() => {
-        if (attachListeners()) {
-          clearInterval(attachInterval);
-          attachInterval = null;
-        }
-      }, 200);
-    }
-
-    return () => {
-      if (attachInterval) {
-        clearInterval(attachInterval);
-      }
-      cleanup();
-    };
-  }, [selectedVideo]);
 
   return (
     <div
@@ -253,26 +101,21 @@ export default function CourseDetails() {
         minHeight: "100vh",
       }}
     >
-      {/* ================================= */}
-      {/* الكارد العلوي */}
-      {/* ================================= */}
-
       {currentCourse && (
         <div
           style={{
             width: "100%",
-            background: "#DCE5F5",
+            background: "#fde6fc",
             borderRadius: "18px",
             padding: "20px",
             display: "flex",
-            direction: "rtl", // هذا سيضمن أن اليمين هو البداية دائماً
+            direction: "rtl",
             alignItems: "center",
             gap: "20px",
             boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
             marginBottom: "20px",
           }}
         >
-          {/* 1. صورة المقرر - ستظهر أقصى اليمين بفضل rtl */}
           <div
             style={{
               width: "170px",
@@ -293,7 +136,6 @@ export default function CourseDetails() {
             />
           </div>
 
-          {/* 2. معلومات المقرر - ستظهر إلى يسار الصورة */}
           <div
             style={{
               display: "flex",
@@ -314,16 +156,14 @@ export default function CourseDetails() {
               {currentCourse.courseName}
             </h1>
 
-            {/* صف المدرس */}
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
                 gap: "12px",
-                direction: "rtl", // نؤكد الاتجاه هنا أيضاً
+                direction: "rtl",
               }}
             >
-              {/* صورة المدرس - ستظهر يمين الاسم بفضل rtl */}
               <div
                 style={{
                   width: "55px",
@@ -345,17 +185,7 @@ export default function CourseDetails() {
                 />
               </div>
 
-              {/* بيانات المدرس النصية */}
               <div style={{ textAlign: "right" }}>
-                {/* <div
-                  style={{
-                    fontSize: "14px",
-                    color: "#666",
-                    marginBottom: "2px",
-                  }}
-                >
-                  المدرس
-                </div> */}
                 <div
                   style={{
                     fontSize: "17px",
@@ -370,10 +200,6 @@ export default function CourseDetails() {
           </div>
         </div>
       )}
-
-      {/* ================================= */}
-      {/* المحتوى */}
-      {/* ================================= */}
 
       <div
         style={{
@@ -747,9 +573,7 @@ export default function CourseDetails() {
 
                 <div
                   onClick={() =>
-                    router.push(
-                      `/Student_Dashboard/quizzes?tab=available&lessonId=${lesson.id}`,
-                    )
+                    router.push(`/Teacher_Dashboard/quiz?lessonId=${lesson.id}`)
                   }
                   style={{
                     cursor: "pointer",
@@ -779,7 +603,7 @@ export default function CourseDetails() {
                 <div
                   onClick={() =>
                     router.push(
-                      `/Student_Dashboard/assignments?tab=available&lessonId=${lesson.id}`,
+                      `/Teacher_Dashboard/assignments?lessonId=${lesson.id}`,
                     )
                   }
                   style={{

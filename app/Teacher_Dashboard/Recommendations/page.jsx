@@ -6,18 +6,12 @@ import PieRecommendations from "@/components/pieRecommendations";
 import { useEffect, useState } from "react";
 // import { useParams } from "next/navigation";
 export default function Recommendations() {
-  // const params = useParams();
-  // const id = params?.id; // هنا استخرجنا الـ id المتغير من الرابط
-
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // if (!id) return;
-
     const fetchAllData = async () => {
       try {
-        // نرسل الـ id الديناميكي إلى الروت الخاص بكِ المصلح إملائياً (analysis)
         const res = await fetch(`/api/teacherDashboard/ai-analysis`);
         const result = await res.json();
 
