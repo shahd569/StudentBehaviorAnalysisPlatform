@@ -59,39 +59,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShield } from "@fortawesome/free-solid-svg-icons";
 import { faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
 
-export default function Cards() {
-  const [stats, setStats] = useState({
-    atRisk: 0,
-    borderline: 0,
-    safe: 0,
-  });
-
-  const [totalStudents, setTotalStudents] = useState(0);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch("/api/teacherDashboard/ai-analysis");
-        const data = await res.json();
-
-        if (res.ok) {
-          setStats(data.stats);
-
-          const total =
-            data.stats.atRisk + data.stats.borderline + data.stats.safe;
-
-          setTotalStudents(total);
-        }
-      } catch (error) {
-        console.error("Error fetching stats:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
+export default function Cards({ stats }) {
+  const totalStudents =
+    (stats?.atRisk || 0) + (stats?.borderline || 0) + (stats?.safe || 0);
 
   const getPercentage = (count) => {
-    if (totalStudents === 0) return 0;
+    if (totalStudents === 0) return "0.0";
     return ((count / totalStudents) * 100).toFixed(1);
   };
 
@@ -138,7 +111,7 @@ export default function Cards() {
 
         <p>{stats.atRisk}</p>
 
-        <p>{getPercentage(stats.atRisk)}% من الصف</p>
+        <p style={{ color: "gray" }}>{getPercentage(stats.atRisk)}% من الصف</p>
       </div>
 
       {/* طلاب على الحافة */}
@@ -180,7 +153,9 @@ export default function Cards() {
 
         <p>{stats.borderline}</p>
 
-        <p>{getPercentage(stats.borderline)}% من الصف</p>
+        <p style={{ color: "gray" }}>
+          {getPercentage(stats.borderline)}% من الصف
+        </p>
       </div>
 
       {/* طلاب آمنون */}
@@ -219,7 +194,7 @@ export default function Cards() {
 
         <p>{stats.safe}</p>
 
-        <p>{getPercentage(stats.safe)}% من الصف</p>
+        <p style={{ color: "gray" }}>{getPercentage(stats.safe)}% من الصف</p>
       </div>
     </div>
   );

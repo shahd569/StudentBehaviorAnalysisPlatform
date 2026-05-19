@@ -46,7 +46,7 @@ export const links = [
     id: 5,
     icon: faLightbulb,
     title: "التوصيات",
-    url: "/contact",
+    url: "/Teacher_Dashboard/Recommendations",
   },
   {
     id: 6,

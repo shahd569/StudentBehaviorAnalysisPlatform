@@ -279,7 +279,13 @@ export default function ContactInfo() {
               alignItems: "center",
             }}
           >
-            <Image src={Linkedin} width={50} height={50} alt="linkedin" />
+            <Image
+              src={Linkedin}
+              width={40}
+              height={40}
+              alt="linkedin"
+              style={{ borderRadius: "50px", marginBottom: "15px" }}
+            />
 
             {!linkedIn ? (
               <input
@@ -320,7 +326,13 @@ export default function ContactInfo() {
               alignItems: "center",
             }}
           >
-            <Image src={Twitter} width={50} height={50} alt="twitter" />
+            <Image
+              src={Twitter}
+              width={40}
+              height={40}
+              alt="twitter"
+              style={{ borderRadius: "50px", marginBottom: "15px" }}
+            />
 
             {!twitter ? (
               <input
@@ -361,7 +373,13 @@ export default function ContactInfo() {
               alignItems: "center",
             }}
           >
-            <Image src={Twitter} width={50} height={50} alt="facebook" />
+            <Image
+              src={Twitter}
+              width={40}
+              height={40}
+              alt="facebook"
+              style={{ borderRadius: "50px", marginBottom: "15px" }}
+            />
 
             {!facebook ? (
               <input

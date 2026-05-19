@@ -103,8 +103,15 @@ export default function Login() {
                   required
                   placeholder="أدخل كلمة المرور"
                 />
-                <Link href="/forgot-password" className={styles.forgotPassword}>
-                  هل نسيت كلمة المرور ؟؟
+                <Link
+                  href="/forgot-password"
+                  style={{
+                    color: "#7A41DC",
+                    fontSize: "14px",
+                    textDecoration: "none",
+                  }}
+                >
+                  هل نسيت كلمة المرور؟
                 </Link>
               </div>
 

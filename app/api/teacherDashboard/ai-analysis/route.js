@@ -1,9 +1,20 @@
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function GET(req, { params }) {
-  const { id } = await params;
-  const teacherId = parseInt(id);
+  // const { id } = await params;
+  // const teacherId = parseInt(id);
 
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) {
+    return NextResponse.json(
+      { message: "غير مصرح لك بالوصول" },
+      { status: 401 },
+    );
+  }
+
+  const teacherId = parseInt(session.user.id);
   //  جلب الطلاب بدون تكرار اذا كانو مسجلين بأكتر من مادة لدى نفس المدرس
 
   const enrollments = await prisma.enrollment.findMany({

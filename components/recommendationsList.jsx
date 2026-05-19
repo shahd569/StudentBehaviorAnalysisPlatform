@@ -30,35 +30,13 @@
 //     )
 // }
 
-
-
 "use client";
 
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 
-export default function RecommendationsList() {
-
-  const [recommendations, setRecommendations] = useState([]);
-
-  useEffect(() => {
-    const fetchRecommendations = async () => {
-      try {
-        const res = await fetch("/api/teacherDashboard/recommendation");
-        const data = await res.json();
-
-        if (res.ok) {
-          setRecommendations(data.teacherRecommendations || []);
-        }
-      } catch (error) {
-        console.error("Error fetching recommendations:", error);
-      }
-    };
-
-    fetchRecommendations();
-  }, []);
-
+export default function RecommendationsList({ recommendations }) {
   return (
     <div
       style={{
@@ -81,12 +59,18 @@ export default function RecommendationsList() {
 
       <hr />
 
-      {recommendations.map((item, index) => (
-        <div key={index}>
-          <p>{item}</p>
-          <hr />
-        </div>
-      ))}
+      {recommendations.length > 0 ? (
+        recommendations.map((item, index) => (
+          <div key={index}>
+            <p>{item.content || item}</p>
+            {index < recommendations.length - 1 && <hr />}
+          </div>
+        ))
+      ) : (
+        <p style={{ color: "gray", textAlign: "center" }}>
+          لا توجد توصيات متاحة حالياً.
+        </p>
+      )}
     </div>
   );
 }

@@ -36,26 +36,9 @@ import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 
-export default function PredictiveRecommendations() {
-  const [predictiveRecommendations, setPredictiveRecommendations] = useState(
-    [],
-  );
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch("/api/teacherDashboard/ai-analysis");
-        const data = await res.json();
-
-        setPredictiveRecommendations(data.predictiveRecommendations || []);
-      } catch (error) {
-        console.error("Error fetching predictive recommendations:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
+export default function PredictiveRecommendations({
+  predictiveRecommendations,
+}) {
   return (
     <div
       style={{
@@ -74,17 +57,17 @@ export default function PredictiveRecommendations() {
         />
         <h4>توصيات النظام التنبؤية </h4>
       </div>
-
+      <hr />
       {predictiveRecommendations.length > 0 ? (
         predictiveRecommendations.map((item, index) => (
           <div key={index}>
-            <hr />
-            <p>{item}</p>
+            <p>{item.content || item}</p>
+            {index < predictiveRecommendations.length - 1 && <hr />}
           </div>
         ))
       ) : (
-        <p style={{ marginTop: "20px", color: "gray" }}>
-          لا توجد توصيات حالياً
+        <p style={{ color: "gray", textAlign: "center" }}>
+          لا توجد توصيات تنبؤية حالياً.
         </p>
       )}
     </div>
