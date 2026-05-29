@@ -9,45 +9,28 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import { Plyr } from "plyr-react";
-import dynamic from "next/dynamic";
-
-import "plyr-react/plyr.css";
 import Image from "next/image";
-
 import { useParams, useRouter } from "next/navigation";
-
 import { useEffect, useMemo, useRef, useState } from "react";
-const Plyr = dynamic(
-  async () => {
-    const mod = await import("plyr-react");
-    return mod.Plyr;
-  },
-  {
-    ssr: false,
-  },
-);
+
 export default function CourseDetails() {
   const [lessons, setLessons] = useState([]);
-
   const [selectedVideo, setSelectedVideo] = useState(null);
-
   const [courseInfo, setCourseInfo] = useState([]);
+  const [currentSpeed, setCurrentSpeed] = useState(1); // تمت الإضافة للتحكم بتلوين زر السرعة
 
   const videoRef = useRef(null);
   const lastTimeRef = useRef(0);
-
   const [watchTime, setWatchTime] = useState(0);
-
   const watchIntervalRef = useRef(null);
-  const params = useParams();
 
+  const params = useParams();
   const courseId = Number(params.id);
   const router = useRouter();
+
   // =========================================
   // جلب الدروس
   // =========================================
-
   useEffect(() => {
     const fetchLessons = async () => {
       try {
@@ -75,7 +58,6 @@ export default function CourseDetails() {
   // =========================================
   // جلب معلومات المقرر
   // =========================================
-
   useEffect(() => {
     const fetchInfo = async () => {
       try {
@@ -96,16 +78,13 @@ export default function CourseDetails() {
     fetchInfo();
   }, []);
 
-  // المقرر الحالي فقط
-
   const currentCourse = useMemo(() => {
     return courseInfo.find((c) => c.id === courseId);
   }, [courseInfo, courseId]);
 
   // =========================================
-  // إرسال التفاعلات
+  // إرسال التفاعلات (لم يتم المساس بمنطقه أبداً)
   // =========================================
-
   const sendInteraction = async ({
     interactionType,
     currentTimeSeconds,
@@ -135,115 +114,89 @@ export default function CourseDetails() {
     }
   };
 
-  useEffect(() => {
-    if (!selectedVideo) return;
-
-    let attachInterval = null;
-    let media = null;
-
-    const cleanup = () => {
-      if (!media) return;
-      media.removeEventListener("play", handlePlay);
-      media.removeEventListener("pause", handlePause);
-      media.removeEventListener("ratechange", handleRateChange);
-      media.removeEventListener("seeking", handleSeeking);
-      media.removeEventListener("seeked", handleSeeked);
-      media.removeEventListener("ended", handleEnded);
-      clearInterval(watchIntervalRef.current);
-    };
-
-    const handlePlay = () => {
-      sendInteraction({
-        interactionType: "PLAY",
-        currentTimeSeconds: Math.floor(media.currentTime),
-      });
-      window.dispatchEvent(new CustomEvent("video-active"));
-      clearInterval(watchIntervalRef.current);
-      watchIntervalRef.current = setInterval(() => {
-        setWatchTime((prev) => {
-          const newTime = prev + 1;
-          if (newTime % 30 === 0) {
-            window.dispatchEvent(new CustomEvent("video-active"));
-            console.log("Activity pulse sent: Student is still watching...");
-          }
-          return newTime;
-        });
-      }, 1000);
-    };
-
-    const handlePause = () => {
-      sendInteraction({
-        interactionType: "PAUSE",
-        currentTimeSeconds: Math.floor(media.currentTime),
-      });
-      clearInterval(watchIntervalRef.current);
-    };
-
-    const handleRateChange = () => {
-      sendInteraction({
-        interactionType: "RATE_CHANGE",
-        currentTimeSeconds: Math.floor(media.currentTime),
-        value: media.playbackRate,
-      });
-    };
-
-    const handleSeeking = () => {
-      lastTimeRef.current = media.currentTime;
-    };
-
-    const handleSeeked = () => {
-      const current = media.currentTime;
-      let type = "SEEK";
-      if (current > lastTimeRef.current) {
-        type = "FORWARD";
-      } else if (current < lastTimeRef.current) {
-        type = "REWIND";
-      }
-      sendInteraction({
-        interactionType: type,
-        currentTimeSeconds: Math.floor(current),
-      });
-    };
-
-    const handleEnded = () => {
-      sendInteraction({
-        interactionType: "STOP",
-        currentTimeSeconds: Math.floor(media.duration),
-      });
-      clearInterval(watchIntervalRef.current);
-    };
-
-    const attachListeners = () => {
-      const player = videoRef.current?.plyr || videoRef.current;
-      if (!player || !player.media) {
-        return false;
-      }
-      media = player.media;
-      media.addEventListener("play", handlePlay);
-      media.addEventListener("pause", handlePause);
-      media.addEventListener("ratechange", handleRateChange);
-      media.addEventListener("seeking", handleSeeking);
-      media.addEventListener("seeked", handleSeeked);
-      media.addEventListener("ended", handleEnded);
-      return true;
-    };
-
-    if (!attachListeners()) {
-      attachInterval = setInterval(() => {
-        if (attachListeners()) {
-          clearInterval(attachInterval);
-          attachInterval = null;
+  // =========================================
+  // دوال التقاط الأحداث المربوطة بالمشغل مباشرة
+  // =========================================
+  const handlePlay = () => {
+    if (!videoRef.current) return;
+    sendInteraction({
+      interactionType: "PLAY",
+      currentTimeSeconds: Math.floor(videoRef.current.currentTime),
+    });
+    window.dispatchEvent(new CustomEvent("video-active"));
+    clearInterval(watchIntervalRef.current);
+    watchIntervalRef.current = setInterval(() => {
+      setWatchTime((prev) => {
+        const newTime = prev + 1;
+        if (newTime % 30 === 0) {
+          window.dispatchEvent(new CustomEvent("video-active"));
+          console.log("Activity pulse sent: Student is still watching...");
         }
-      }, 200);
-    }
+        return newTime;
+      });
+    }, 1000);
+  };
 
-    return () => {
-      if (attachInterval) {
-        clearInterval(attachInterval);
-      }
-      cleanup();
-    };
-  }, [selectedVideo]);
+  const handlePause = () => {
+    if (!videoRef.current) return;
+    sendInteraction({
+      interactionType: "PAUSE",
+      currentTimeSeconds: Math.floor(videoRef.current.currentTime),
+    });
+    clearInterval(watchIntervalRef.current);
+  };
+
+  const handleRateChange = () => {
+    if (!videoRef.current) return;
+    const speed = videoRef.current.playbackRate;
+    setCurrentSpeed(speed);
+    sendInteraction({
+      interactionType: "RATE_CHANGE",
+      currentTimeSeconds: Math.floor(videoRef.current.currentTime),
+      value: speed,
+    });
+  };
+
+  const handleSeeking = () => {
+    if (!videoRef.current) return;
+    lastTimeRef.current = videoRef.current.currentTime;
+  };
+
+  const handleSeeked = () => {
+    if (!videoRef.current) return;
+    const current = videoRef.current.currentTime;
+    let type = "SEEK";
+    if (current > lastTimeRef.current) {
+      type = "FORWARD";
+    } else if (current < lastTimeRef.current) {
+      type = "REWIND";
+    }
+    sendInteraction({
+      interactionType: type,
+      currentTimeSeconds: Math.floor(current),
+    });
+  };
+
+  const handleEnded = () => {
+    if (!videoRef.current) return;
+    sendInteraction({
+      interactionType: "STOP",
+      currentTimeSeconds: Math.floor(videoRef.current.duration),
+    });
+    clearInterval(watchIntervalRef.current);
+  };
+
+  const changePlaybackSpeed = (speed) => {
+    if (videoRef.current) {
+      videoRef.current.playbackRate = speed;
+      setCurrentSpeed(speed);
+    }
+  };
+
+  // تنظيف الـ Interval عند إغلاق الصفحة
+  useEffect(() => {
+    return () => clearInterval(watchIntervalRef.current);
+  }, []);
 
   return (
     <div
@@ -265,14 +218,13 @@ export default function CourseDetails() {
             borderRadius: "18px",
             padding: "20px",
             display: "flex",
-            direction: "rtl", // هذا سيضمن أن اليمين هو البداية دائماً
+            direction: "rtl",
             alignItems: "center",
             gap: "20px",
             boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
             marginBottom: "20px",
           }}
         >
-          {/* 1. صورة المقرر - ستظهر أقصى اليمين بفضل rtl */}
           <div
             style={{
               width: "170px",
@@ -293,7 +245,6 @@ export default function CourseDetails() {
             />
           </div>
 
-          {/* 2. معلومات المقرر - ستظهر إلى يسار الصورة */}
           <div
             style={{
               display: "flex",
@@ -314,16 +265,14 @@ export default function CourseDetails() {
               {currentCourse.courseName}
             </h1>
 
-            {/* صف المدرس */}
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
                 gap: "12px",
-                direction: "rtl", // نؤكد الاتجاه هنا أيضاً
+                direction: "rtl",
               }}
             >
-              {/* صورة المدرس - ستظهر يمين الاسم بفضل rtl */}
               <div
                 style={{
                   width: "55px",
@@ -345,17 +294,7 @@ export default function CourseDetails() {
                 />
               </div>
 
-              {/* بيانات المدرس النصية */}
               <div style={{ textAlign: "right" }}>
-                {/* <div
-                  style={{
-                    fontSize: "14px",
-                    color: "#666",
-                    marginBottom: "2px",
-                  }}
-                >
-                  المدرس
-                </div> */}
                 <div
                   style={{
                     fontSize: "17px",
@@ -396,55 +335,87 @@ export default function CourseDetails() {
         >
           {selectedVideo ? (
             <>
+              {/* التعديل الجذري: المشغل الناتي مع شريط السرعة */}
               <div
                 style={{
                   width: "100%",
-                  // maxHeight: "70vh",
-                  background: "#000",
-                  borderRadius: "16px",
+                  position: "relative",
+                  paddingTop: "56.25%",
+                  borderRadius: "16px 16px 0 0",
                   overflow: "hidden",
-                  // display: "flex",
-                  // justifyContent: "center",
-                  // alignItems: "center",
+                  backgroundColor: "#000",
                 }}
               >
-                <Plyr
+                <video
                   ref={videoRef}
-                  source={{
-                    type: "video",
-                    sources: [
-                      {
-                        src: selectedVideo.videoUrl,
-                        provider: "html5",
-                        type: "video/mp4",
-                      },
-                    ],
+                  src={selectedVideo.videoUrl} // تم استخدام الرابط من الكائن الخاص بكِ
+                  controls
+                  controlsList="nodownload"
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
                   }}
-                  options={{
-                    controls: [
-                      "play-large",
-                      "restart",
-                      "rewind",
-                      "play",
-                      "fast-forward",
-                      "progress",
-                      "current-time",
-                      "duration",
-                      "mute",
-                      "volume",
-                      "settings",
-                      "fullscreen",
-                    ],
-
-                    settings: ["speed"],
-
-                    speed: {
-                      selected: 1,
-                      options: [0.5, 0.75, 1, 1.25, 1.5, 2],
-                    },
-                  }}
+                  onPlay={handlePlay}
+                  onPause={handlePause}
+                  onSeeking={handleSeeking}
+                  onSeeked={handleSeeked}
+                  onRateChange={handleRateChange}
+                  onEnded={handleEnded}
                 />
               </div>
+
+              {/* شريط التحكم المتقدم بالسرعة */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  backgroundColor: "#1e1e2f",
+                  padding: "12px 20px",
+                  borderRadius: "0 0 16px 16px",
+                  color: "#fff",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                }}
+              >
+                <span style={{ fontSize: "15px", fontWeight: "500" }}>
+                  سرعة تشغيل المحاضرة:
+                </span>
+                <div style={{ display: "flex", gap: "10px", direction: "ltr" }}>
+                  {[0.5, 1, 1.25, 1.5, 2].map((speed) => (
+                    <button
+                      key={speed}
+                      onClick={() => changePlaybackSpeed(speed)}
+                      style={{
+                        padding: "6px 14px",
+                        borderRadius: "6px",
+                        border: "none",
+                        cursor: "pointer",
+                        fontWeight: "bold",
+                        fontSize: "14px",
+                        transition: "all 0.2s ease",
+                        backgroundColor:
+                          currentSpeed === speed ? "#7c3aed" : "#374151",
+                        color: "#fff",
+                      }}
+                      onMouseOver={(e) => {
+                        if (currentSpeed !== speed)
+                          e.target.style.backgroundColor = "#4b5563";
+                      }}
+                      onMouseOut={(e) => {
+                        if (currentSpeed !== speed)
+                          e.target.style.backgroundColor = "#374151";
+                      }}
+                    >
+                      {speed === 1 ? "طبيعي (1x)" : `${speed}x`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {/* وصف الفيديو */}
 
               <div
@@ -472,14 +443,7 @@ export default function CourseDetails() {
                   {selectedVideo.videoDescription || "لا يوجد وصف لهذا الفيديو"}
                 </p>
               </div>
-              {/* <div
-                style={{
-                  marginTop: "20px",
-                  padding: "15px",
-                  borderRadius: "12px",
-                  background: "#F3F4F6",
-                }}
-              > */}
+
               {/* قائمة تشغيل الفيديوهات */}
 
               <div
@@ -511,7 +475,10 @@ export default function CourseDetails() {
                   ?.lessonVideos.map((video, index) => (
                     <div
                       key={index}
-                      onClick={() => setSelectedVideo(video)}
+                      onClick={() => {
+                        setSelectedVideo(video);
+                        setCurrentSpeed(1); // تصفير السرعة عند تغيير الفيديو
+                      }}
                       style={{
                         display: "flex",
                         alignItems: "center",
@@ -577,7 +544,6 @@ export default function CourseDetails() {
                     </div>
                   ))}
               </div>
-              {/* </div> */}
             </>
           ) : (
             <div>لا يوجد فيديو</div>

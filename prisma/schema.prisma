@@ -22,6 +22,8 @@ model Users {
   major                String?
   academicYear         String?
   employeeId           String?                   @unique
+  teacherOverview         String?
+  teacherSpecialization String?
   alerts               AlertAndRecommendations[]
   assignmentSubmission AssignmentSubmission[]
   taughtCourses        Course[]                  @relation("TaughtCourses")
@@ -321,15 +323,13 @@ enum SessionStatus {
 }
 
 enum AlerType {
-  PERFORMANCE_ALERT
+  NEW_CONTENT
   RECOMMENDATION
   DUE_DATE_REMINDER
   ANNOUNCEMENT
 }
 
 enum TriggerReason {
-  LOW_QUIZ_SCORE
-  LOW_ACTIVITY
   LATE_SUBMISSION
   NEW_CONTENT
 }

@@ -1,95 +1,3 @@
-// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import { faUser , faCamera, faPen} from "@fortawesome/free-solid-svg-icons";
-// import Image from "next/image";
-// import Teacher from "@/public/image/teacher.png"
-// import ChangePassword from "@/components/changePassword"
-// import ContactInfo from "@/components/contactInfo"
-// export default function TeacherDashboard(){
-//   return (
-//     <div style={{display:"flex", flexDirection:"column",padding:"20px 40px", gap:"40px"}}>
-//       <div>
-//         <h1 style={{ fontWeight: "bold" }}>الحساب الشخصي</h1>
-//       <p
-//         style={{
-//           fontSize: "18px",
-//           fontWeight: "bold",
-//           color: "gray",
-//         }}
-//       >
-//        إدارة معلوماتك الشخصية وإعدادات الحساب
-//       </p>
-//       </div>
-
-//       <div style={{display:"flex", gap:"20px"}}>
-//         <div style={{display:"flex", flexDirection:"column", backgroundColor:"#F5D7F4", flex:"1", padding:"20px", borderRadius:"15px"}}>
-//           <h3 style={{marginBottom:"20px"}}>ملخص الحساب</h3>
-//           <div style={{display:"flex", justifyContent:"space-between"}}>
-//           <p>عدد المقررات</p>
-//           <p>12</p>
-//         </div>
-//         <hr></hr>
-//         <div style={{display:"flex", justifyContent:"space-between"}}>
-//           <p>عدد الطلاب</p>
-//           <p>12</p>
-//         </div>
-//         <hr></hr>
-//         <div style={{display:"flex", justifyContent:"space-between"}}>
-//           <p>عدد المحاضرات المنشورة </p>
-//           <p>12</p>
-//         </div>
-//       </div>
-//       <div style={{padding:"20px", borderRadius:"15px",border:"2px solid #dad9d9",flex:"4"}}>
-//         <div style={{display:"flex", gap:"20px"}}>
-//           <FontAwesomeIcon
-//             icon={faUser}
-//             style={{ color: "#9f04f8", fontSize:"30px" }}
-//             />
-//             <h3>المعلومات الشخصية</h3>
-//         </div>
-//         <div style={{display:"flex", gap:"40px"}}>
-//           {/* User Info */}
-//           <div style={{flex:"2"}}>
-//             <div style={{
-//               display: "grid",
-//               gridTemplateColumns:" repeat(auto-fill, minmax(210px, 1fr))",
-//               gap: "20px" ,
-//               padding: "20px",
-//              }}>
-//               <div>
-//                 <label>الاسم الكامل</label>
-//                 <p style={{backgroundColor:"#eee", borderRadius:"10px", height:"40px", border:"1px solid #ccc", padding:"10px" ,display:"flex", justifyContent:"space-between"}}>
-//                    د.فدا جهجاه
-//                    <FontAwesomeIcon icon={faPen} style={{}}></FontAwesomeIcon>
-//                    </p>
-//               </div>
-//               <div>
-//                 <label>البريد الإلكتروني </label>
-//                 <p style={{backgroundColor:"#eee", borderRadius:"10px", height:"40px", border:"1px solid #ccc", padding:"10px" ,display:"flex", justifyContent:"space-between"}}></p>
-//               </div>
-//               <div>
-//                 <label>رقم التوظيف</label>
-//                 <p style={{backgroundColor:"#eee", borderRadius:"10px", height:"40px", border:"1px solid #ccc", padding:"10px"}}>د.فدا جهجاه</p>
-//               </div>
-
-//         </div>
-//           </div>
-//           {/* User Image */}
-//           <div style={{flex:"1"}}>
-//             <Image src={Teacher} width={200} height={200} alt="teacher" style={{borderRadius:"50%", border:"5px solid #e4bafc",position:"relative"}}></Image>
-//             <div style={{position:"relative", border:"1px solid #ccc",backgroundColor:"white", borderRadius:"50%",top:"-50px", width:"50px", height:"50px", display:"flex", justifyContent:"center", alignItems:"center"}}>
-//               <FontAwesomeIcon icon={faCamera} style={{fontSize:"25px", color:"#9f04f8"}}></FontAwesomeIcon>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//     <div style={{display:"flex", gap:"20px"}}>
-//       <ChangePassword></ChangePassword>
-//       <ContactInfo></ContactInfo>
-//     </div>
-//     </div>
-//   )
-// }
 "use client";
 
 import { useEffect, useState, useRef } from "react";
@@ -407,7 +315,11 @@ export default function TeacherDashboard() {
             {/* User Image */}
             <div style={{ flex: "1" }}>
               <Image
-                src={data.profilePictureUrl ? data.profilePictureUrl : Teacher}
+                src={
+                  avatar
+                    ? URL.createObjectURL(avatar)
+                    : data.profilePictureUrl || Teacher
+                }
                 width={200}
                 height={200}
                 alt="teacher"

@@ -58,7 +58,7 @@ export const links = [
     id: 7,
     icon: faBullhorn,
     title: "الإعلانات",
-    url: "/Teacher_Dashboard/settings",
+    url: "/Teacher_Dashboard/Announcement",
   },
   {
     id: 8,

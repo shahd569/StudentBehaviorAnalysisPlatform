@@ -30,6 +30,10 @@ export async function GET() {
         email: true,
         profilePictureUrl: true,
         employeeId: true,
+        universityId: true,
+        college: true,
+        major: true,
+        academicYear: true,
         contactInfo: {
           select: {
             phone: true,

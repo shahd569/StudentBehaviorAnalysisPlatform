@@ -30,6 +30,7 @@
     "next-auth": "^4.24.13",
     "next-react-videojs": "^1.0.0",
     "nodemailer": "^7.0.13",
+    "papaparse": "^5.5.3",
     "plyr": "^3.8.4",
     "plyr-react": "^6.0.0",
     "prisma": "^5.22.0",

@@ -18,7 +18,6 @@ export async function GET() {
     const userId = parseInt(session.user.id);
     // const userId = 17;
 
-    // 2. جلب البيانات الشخصية مع عداد الإشعارات والرسائل في استعلام واحد
     const userData = await prisma.users.findUnique({
       where: { id: userId },
       select: {
@@ -26,16 +25,21 @@ export async function GET() {
         lastName: true,
         profilePictureUrl: true,
         role: true,
-        // استخدام _count لجلب الأرقام التي ستظهر فوق الأيقونات
         _count: {
           select: {
-            // عد الرسائل المستلمة التي لم تُقرأ بعد
-            receivedMessages: {
-              where: { isRead: false },
-            },
-            // عد التنبيهات والتوصيات التي لم تُشاهد بعد
             alerts: {
-              where: { isRead: false },
+              where: {
+                isRead: false,
+                OR: [
+                  { alertType: "DUE_DATE_REMINDER" },
+                  {
+                    AND: [
+                      { alertType: "NEW_CONTENT" },
+                      { triggerReason: "NEW_CONTENT" },
+                    ],
+                  },
+                ],
+              },
             },
           },
         },
@@ -49,13 +53,20 @@ export async function GET() {
       );
     }
 
-    // 3. تنسيق البيانات المرسلة للفرونت إند
+    const announcementsCount = await prisma.AlertAndRecommendations.count({
+      where: {
+        userId: userId,
+        isRead: false,
+        alertType: "ANNOUNCEMENT",
+      },
+    });
+
     return NextResponse.json({
       fullName: `${userData.firstName} ${userData.lastName}`,
       avatar: userData.profilePictureUrl || "/default-avatar.png",
       role: userData.role,
       notifications: {
-        messagesCount: userData._count.receivedMessages,
+        announcementsCount: announcementsCount,
         alertsCount: userData._count.alerts,
       },
     });

@@ -62,6 +62,7 @@ import Image from "next/image";
 
 import Linkedin from "@/public/image/linkedin.png";
 import Twitter from "@/public/image/twitter.png";
+import Facebook from "@/public/image/facebook.png";
 
 export default function ContactInfo() {
   const [data, setData] = useState(null);
@@ -69,6 +70,9 @@ export default function ContactInfo() {
   // حالات التعديل
   const [editPhone, setEditPhone] = useState(false);
   const [editEmail, setEditEmail] = useState(false);
+  const [editFacebook, setEditFacebook] = useState(false);
+  const [editLinkedIn, setEditLinkedIn] = useState(false);
+  const [editTwitter, setEditTwitter] = useState(false);
 
   // القيم
   const [phone, setPhone] = useState("");
@@ -99,6 +103,49 @@ export default function ContactInfo() {
 
     fetchProfile();
   }, []);
+
+  const handleSave = async () => {
+    try {
+      const formData = new FormData();
+
+      formData.append("contactEmail", contactEmail);
+      formData.append("phone", phone);
+      formData.append("facebook", facebook);
+      formData.append("linkedIn", linkedIn);
+      formData.append("twitter", twitter);
+
+      const res = await fetch("/api/teacherDashboard/settings/updateProfile", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.message);
+      }
+
+      alert("تم حفظ التعديلات بنجاح");
+
+      setEditEmail(false);
+      setEditPhone(false);
+      setEditFacebook(false);
+      setEditLinkedIn(false);
+      setEditTwitter(false);
+
+      setData((prev) => ({
+        ...prev,
+        contactEmail,
+        phone,
+        facebook,
+        linkedIn,
+        twitter,
+      }));
+    } catch (error) {
+      console.error(error);
+      alert("حدث خطأ أثناء الحفظ");
+    }
+  };
 
   return (
     <div
@@ -301,6 +348,20 @@ export default function ContactInfo() {
                   width: "100%",
                 }}
               />
+            ) : editLinkedIn ? (
+              <input
+                type="text"
+                value={linkedIn}
+                onChange={(e) => setLinkedIn(e.target.value)}
+                style={{
+                  backgroundColor: "#eee",
+                  borderRadius: "10px",
+                  height: "40px",
+                  border: "1px solid #ccc",
+                  padding: "10px",
+                  width: "100%",
+                }}
+              />
             ) : (
               <p
                 style={{
@@ -310,9 +371,84 @@ export default function ContactInfo() {
                   border: "1px solid #ccc",
                   padding: "10px",
                   width: "100%",
+                  display: "flex",
+                  justifyContent: "space-between",
                 }}
               >
-                {linkedIn}
+                <span> {linkedIn}</span>
+                <FontAwesomeIcon
+                  icon={faPen}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setEditLinkedIn(true)}
+                />
+              </p>
+            )}
+          </div>
+
+          {/* Facebook */}
+
+          <div
+            style={{
+              display: "flex",
+              gap: "10px",
+              alignItems: "center",
+            }}
+          >
+            <Image
+              src={Facebook}
+              width={38}
+              height={38}
+              alt="facebook"
+              style={{ borderRadius: "50px", marginBottom: "15px" }}
+            />
+
+            {!facebook ? (
+              <input
+                type="text"
+                value={facebook}
+                onChange={(e) => setFacebook(e.target.value)}
+                style={{
+                  backgroundColor: "#eee",
+                  borderRadius: "10px",
+                  height: "40px",
+                  border: "1px solid #ccc",
+                  padding: "10px",
+                  width: "100%",
+                }}
+              />
+            ) : editFacebook ? (
+              <input
+                type="text"
+                value={facebook}
+                onChange={(e) => setFacebook(e.target.value)}
+                style={{
+                  backgroundColor: "#eee",
+                  borderRadius: "10px",
+                  height: "40px",
+                  border: "1px solid #ccc",
+                  padding: "10px",
+                  width: "100%",
+                }}
+              />
+            ) : (
+              <p
+                style={{
+                  backgroundColor: "#eee",
+                  borderRadius: "10px",
+                  height: "40px",
+                  border: "1px solid #ccc",
+                  padding: "10px",
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <span> {facebook}</span>
+                <FontAwesomeIcon
+                  icon={faPen}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setEditFacebook(true)}
+                />
               </p>
             )}
           </div>
@@ -348,44 +484,11 @@ export default function ContactInfo() {
                   width: "100%",
                 }}
               />
-            ) : (
-              <p
-                style={{
-                  backgroundColor: "#eee",
-                  borderRadius: "10px",
-                  height: "40px",
-                  border: "1px solid #ccc",
-                  padding: "10px",
-                  width: "100%",
-                }}
-              >
-                {twitter}
-              </p>
-            )}
-          </div>
-
-          {/* Facebook */}
-
-          <div
-            style={{
-              display: "flex",
-              gap: "10px",
-              alignItems: "center",
-            }}
-          >
-            <Image
-              src={Twitter}
-              width={40}
-              height={40}
-              alt="facebook"
-              style={{ borderRadius: "50px", marginBottom: "15px" }}
-            />
-
-            {!facebook ? (
+            ) : editTwitter ? (
               <input
                 type="text"
-                value={facebook}
-                onChange={(e) => setFacebook(e.target.value)}
+                value={twitter}
+                onChange={(e) => setTwitter(e.target.value)}
                 style={{
                   backgroundColor: "#eee",
                   borderRadius: "10px",
@@ -404,13 +507,34 @@ export default function ContactInfo() {
                   border: "1px solid #ccc",
                   padding: "10px",
                   width: "100%",
+                  display: "flex",
+                  justifyContent: "space-between",
                 }}
               >
-                {facebook}
+                <span>{twitter}</span>
+                <FontAwesomeIcon
+                  icon={faPen}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setEditTwitter(true)}
+                />
               </p>
             )}
           </div>
         </div>
+        <button
+          onClick={handleSave}
+          style={{
+            backgroundColor: "#9f04f8",
+            color: "white",
+            borderRadius: "10px",
+            padding: "10px 20px",
+            border: "none",
+            marginTop: "20px",
+            cursor: "pointer",
+          }}
+        >
+          حفظ التعديلات
+        </button>
       </div>
     </div>
   );

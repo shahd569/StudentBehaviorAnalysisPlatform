@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Style from "@/components/table.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
+import Link from "next/link";
 
 const Table = ({ quizzes }) => {
   return (
@@ -87,10 +88,14 @@ const Table = ({ quizzes }) => {
               </span>
             </td>
             <td style={{ padding: "10px", borderRadius: "10px 0 0 10px" }}>
-              <FontAwesomeIcon
-                icon={faEye}
-                style={{ color: "gray" }}
-              ></FontAwesomeIcon>
+              <Link href={`/Teacher_Dashboard/quiz/${item.id}/quizDetails`}>
+                <button aria-label="عرض الاختبار">
+                  <FontAwesomeIcon
+                    icon={faEye}
+                    style={{ color: "gray" }}
+                  ></FontAwesomeIcon>
+                </button>
+              </Link>
             </td>
           </tr>
         ))}

@@ -5,6 +5,7 @@ import {
   faCommentDots,
   faBullhorn,
   faUserAlt,
+  faBell,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useSWR from "swr";
@@ -18,6 +19,7 @@ interface NavbarData {
   notifications: {
     messagesCount: number;
     alertsCount: number;
+    announcementsCount: number;
   };
 }
 
@@ -45,11 +47,11 @@ const Navbar = () => {
         }}
       >
         <FontAwesomeIcon
-          icon={faCommentDots}
+          icon={faBell}
           style={{ color: "gray", width: "18px" }}
         />
         {/* إظهار عدد الرسائل فقط إذا كان أكبر من صفر */}
-        {data?.notifications?.messagesCount ? (
+        {data?.notifications?.alertsCount ? (
           <div
             className="position-absolute d-flex align-items-center justify-content-center rounded-circle text-white"
             style={{
@@ -61,7 +63,7 @@ const Navbar = () => {
               fontSize: "10px",
             }}
           >
-            {data?.notifications.messagesCount}
+            {data?.notifications.alertsCount}
           </div>
         ) : null}
       </div>
@@ -76,7 +78,7 @@ const Navbar = () => {
           style={{ color: "gray", width: "18px" }}
         />
         {/* إظهار عدد التنبيهات فقط إذا كان أكبر من صفر */}
-        {data?.notifications?.alertsCount ? (
+        {data?.notifications?.announcementsCount ? (
           <div
             className="position-absolute d-flex align-items-center justify-content-center rounded-circle text-white"
             style={{
@@ -88,7 +90,7 @@ const Navbar = () => {
               fontSize: "10px",
             }}
           >
-            {data?.notifications.alertsCount}
+            {data?.notifications.announcementsCount}
           </div>
         ) : null}
       </div>
