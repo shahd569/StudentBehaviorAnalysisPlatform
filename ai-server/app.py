@@ -9,7 +9,7 @@ app = Flask(__name__)
 behavior_model = joblib.load("behavior_model.pkl")
 sentiment_model = joblib.load("sentiment_model.pkl")
 final_model = joblib.load("final_model.pkl")
-
+vectorizer = joblib.load("vectorizer.pkl")
 # -----------------------------------
 # 🧠 1. Behavior Model
 # -----------------------------------
@@ -46,7 +46,9 @@ def predict_sentiment():
         if not isinstance(text, str):
             text = str(text)
         
-        prediction = sentiment_model.predict([text])
+        text_vec = vectorizer.transform([text])
+
+        prediction = sentiment_model.predict(text_vec)
         
         return jsonify({
             "sentiment": int(prediction[0])

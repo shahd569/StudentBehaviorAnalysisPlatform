@@ -42,14 +42,14 @@ export default function DonationModal() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [course, setCourse] = useState("");
-  const [receiver, setReceiver] = useState("");
+  // const [receiver, setReceiver] = useState("");
   const [notify, setNotify] = useState(false);
   const [file, setFile] = useState(null);
   const [coursesList, setCoursesList] = useState([]);
 
   useEffect(() => {
     const fetchCourses = async () => {
-      const res = await fetch("/api/teacherCourses");
+      const res = await fetch("/api/teacherDashboard/coursesList");
       const data = await res.json();
       setCoursesList(data);
     };
@@ -75,7 +75,7 @@ export default function DonationModal() {
       formData.append("title", title);
       formData.append("content", content);
       formData.append("course", course);
-      formData.append("receiver", receiver);
+      // formData.append("receiver", receiver);
       formData.append("notify", notify);
       if (fileUrl) {
         formData.append("fileUrl", fileUrl);
@@ -101,7 +101,7 @@ export default function DonationModal() {
       setTitle("");
       setContent("");
       setCourse("");
-      setReceiver("");
+      // setReceiver("");
       setNotify(false);
       setFile(null);
     } catch (err) {
@@ -220,14 +220,14 @@ export default function DonationModal() {
                 }}
               >
                 <option value="">اختر</option>
-                {coursesList.map((c) => (
+                {coursesList?.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.courseName}
                   </option>
                 ))}
               </select>
             </div>
-            <div>
+            {/* <div>
               <label
                 style={{ color: "black", fontSize: "20px", margin: "15px" }}
               >
@@ -251,7 +251,7 @@ export default function DonationModal() {
                 <option>جميع الطلاب</option>
                 <option>طلاب المادة</option>
               </select>
-            </div>
+            </div> */}
           </div>
 
           {/* إشعار */}

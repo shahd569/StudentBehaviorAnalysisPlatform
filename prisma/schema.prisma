@@ -34,6 +34,7 @@ model Users {
   sessions             UserSession[]
   interactions         VideoInteraction[]
   contactInfo          ContactInfo?
+  announcements        Announcement[]
 }
 
 model PasswordReset {
@@ -249,8 +250,10 @@ model Announcement {
   attachmentURL String?
   title         String
   courseId      Int?
+  creatorId     Int?
   course        Course?  @relation(fields: [courseId], references: [id])
   alerts       AlertAndRecommendations[]
+  creator       Users?   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
 }
 
 model Message {

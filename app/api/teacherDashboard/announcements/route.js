@@ -17,6 +17,48 @@ export async function GET() {
     // const teacherId = parseInt(session?.user.id);
     const teacherId = 17;
 
+    const adminAlerts = await prisma.AlertAndRecommendations.findMany({
+      where: {
+        userId: teacherId,
+        alertType: "ANNOUNCEMENT", // الفئة الخاصة بالإعلانات
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        isRead: true,
+        announcement: {
+          select: {
+            id: true,
+            title: true,
+            content: true,
+            createdAt: true,
+            attachmentURL: true,
+            creator: {
+              select: {
+                firstName: true,
+                lastName: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const adminAnnouncements = adminAlerts
+      .filter((alert) => alert.announcement !== null)
+      .map((alert) => ({
+        id: alert.announcement.id,
+        title: alert.announcement.title,
+        content: alert.announcement.content,
+        createdAt: alert.announcement.createdAt,
+        attachmentURL: alert.announcement.attachmentURL,
+        senderName: alert.announcement.creator
+          ? `المشرف: ${alert.announcement.creator.firstName} ${alert.announcement.creator.lastName}`
+          : "إدارة المنصة",
+        isRead: alert.isRead,
+      }));
+
     const teacherAnnouncements = await prisma.Announcement.findMany({
       where: {
         course: {
@@ -32,7 +74,7 @@ export async function GET() {
       },
     });
 
-    const announcements = teacherAnnouncements.map((a) => {
+    const myAnnouncements = teacherAnnouncements.map((a) => {
       return {
         title: a.title,
         content: a.content,
@@ -41,7 +83,10 @@ export async function GET() {
         courseName: a.course.courseName,
       };
     });
-    return NextResponse.json({ announcements }, { status: 201 });
+    return NextResponse.json(
+      { adminAnnouncements, myAnnouncements },
+      { status: 201 },
+    );
   } catch (error) {
     console.error("Error fetching announcements:", error);
     return NextResponse.json(

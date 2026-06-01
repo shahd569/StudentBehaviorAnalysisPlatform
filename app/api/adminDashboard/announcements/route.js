@@ -11,7 +11,7 @@ export async function POST(req) {
 
     // التحقق من أن المستخدم معلم
     const session = await getServerSession(authOptions);
-    if (!session || session.user.role !== "TEACHER") {
+    if (!session || session.user.role !== "ADMIN") {
       return NextResponse.json(
         { message: "غير مسموح لك بإنشاء إعلانات" },
         { status: 401 },
@@ -19,19 +19,17 @@ export async function POST(req) {
     }
 
     // جلب بيانات المعلم الكاملة
-    const teacher = await prisma.Users.findUnique({
+    const admin = await prisma.Users.findUnique({
       where: { id: parseInt(session.user.id) },
+      // where: { id: 46 },
       select: { firstName: true, lastName: true },
     });
 
-    const teacherName = teacher
-      ? `${teacher.firstName} ${teacher.lastName}`
-      : "الأستاذ";
+    const adminName = admin ? `${admin.firstName} ${admin.lastName}` : "المشرف";
 
     const title = formData.get("title")?.toString() || "";
     const content = formData.get("content")?.toString() || "";
-    const course = formData.get("course")?.toString() || "";
-    // const receiver = formData.get("receiver")?.toString() || "";
+    const receiver = formData.get("receiver")?.toString() || "";
     const notify = formData.get("notify") === "true";
 
     const file = formData.get("file");
@@ -59,32 +57,43 @@ export async function POST(req) {
       data: {
         title,
         content,
-        course:
-          // receiver === "طلاب المادة"
-          { connect: { id: parseInt(course) } },
-        // : undefined,
+        creatorId: parseInt(session.user.id),
         attachmentURL: fileUrl,
       },
     });
 
     if (notify) {
       // جلب معرفات الطلاب المستهدفين
-      let targetStudentIds = [];
+      let targetIds = [];
 
-      const enrollments = await prisma.Enrollment.findMany({
-        where: { courseId: parseInt(course) },
-        select: { studentId: true },
-      });
-      targetStudentIds = enrollments.map((e) => e.studentId);
+      if (receiver === "الطلاب فقط") {
+        const students = await prisma.Users.findMany({
+          where: { role: "STUDENT" },
+          select: { id: true },
+        });
+        targetIds = students.map((e) => e.id);
+      } else if (receiver === "المدرسون فقط") {
+        const teachers = await prisma.Users.findMany({
+          where: { role: "TEACHER" },
+          select: { id: true },
+        });
+        targetIds = teachers.map((e) => e.id);
+      } else {
+        const all = await prisma.Users.findMany({
+          where: { OR: [{ role: "STUDENT" }, { role: "TEACHER" }] },
+          select: { id: true },
+        });
+        targetIds = all.map((s) => s.id);
+      }
 
       // إنشاء إشعارات في جدول التنبيهات لجميع الطلاب المستهدفين
       await prisma.AlertAndRecommendations.createMany({
-        data: targetStudentIds.map((id) => ({
+        data: targetIds.map((id) => ({
           userId: id,
           alertType: "ANNOUNCEMENT",
           triggerReason: "NEW_CONTENT",
-          content: `قام المدرّس/ة ${teacherName} بنشر إعلان جديد بخصوص ${content}`,
-          title: `إعلان جديد من ${teacherName}: ${title}`,
+          content: `قام المشرف ${adminName} بنشر إعلان جديد بخصوص ${content}`,
+          title: `إعلان جديد من ${adminName}: ${title}`,
           isRead: false,
           announcementId: newAnnouncement.id,
         })),
