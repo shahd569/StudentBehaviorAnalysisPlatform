@@ -52,6 +52,10 @@ export async function POST(req) {
       );
     }
 
+    // متغيّرات للاحتفاظ بالبيانات المرفوعة من قبل الأدمن للمدرس
+    let fetchedOverview = null;
+    let fetchedSpecialization = null;
+
     if (role === "STUDENT") {
       if (!universityId) {
         return NextResponse.json(
@@ -104,6 +108,8 @@ export async function POST(req) {
           { status: 403 },
         );
       }
+      fetchedOverview = authStaff.teacherOverview;
+      fetchedSpecialization = authStaff.teacherSpecialization;
     }
 
     const hashedPass = await hash(hashedPassword, 10);
@@ -122,6 +128,9 @@ export async function POST(req) {
           major,
           academicYear,
           employeeId,
+          teacherOverview: role === "TEACHER" ? fetchedOverview : null,
+          teacherSpecialization:
+            role === "TEACHER" ? fetchedSpecialization : null,
         },
       });
 

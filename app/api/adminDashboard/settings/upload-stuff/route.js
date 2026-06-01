@@ -44,13 +44,21 @@ export async function POST(request) {
       const line = lines[i].trim();
       if (!line) continue;
 
-      const [employeeId, firstName, lastName] = line.split(",");
+      const [
+        employeeId,
+        firstName,
+        lastName,
+        teacherOverview,
+        teacherSpecialization,
+      ] = line.split(",");
 
       if (employeeId && firstName && lastName) {
         staffToAuthorize.push({
           employeeId: employeeId.trim(),
           firstName: firstName.trim(),
           lastName: lastName.trim(),
+          teacherOverview: teacherOverview.trim(),
+          teacherSpecialization: teacherSpecialization.trim(),
           isRegistered: false,
         });
         uploadedEmployeeIds.push(employeeId.trim());

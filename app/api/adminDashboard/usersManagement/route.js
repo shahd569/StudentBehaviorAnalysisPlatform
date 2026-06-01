@@ -20,6 +20,7 @@ export async function GET() {
         firstName: true,
         lastName: true,
         registrationDate: true,
+        profilePictureUrl: true,
         role: true,
       },
       orderBy: {

@@ -281,6 +281,8 @@ model AuthorizedStuff {
   firstName    String
   lastName     String
   isRegistered Boolean @default(false)
+  teacherOverview String?
+  teacherSpecialization String?
 }
 
 view StudentPerformanceView {

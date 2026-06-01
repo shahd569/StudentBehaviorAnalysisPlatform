@@ -50,7 +50,7 @@ export default function Announcement() {
     >
       <h1 style={{ fontWeight: "bold" }}>الإعلانات</h1>
       {/* قسم إعلانات الإدارة في الأعلى */}
-      <div style={{ marginBottom: "40px" }}>
+      {/* <div style={{ marginBottom: "40px" }}>
         <h3
           style={{
             color: "#333",
@@ -84,9 +84,9 @@ export default function Announcement() {
                   boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
                   position: "relative",
                 }}
-              >
-                {/* شارة إعلان غير مقروء */}
-                {!adminAcc.isRead && (
+              > */}
+      {/* شارة إعلان غير مقروء */}
+      {/* {!adminAcc.isRead && (
                   <span
                     style={{
                       position: "absolute",
@@ -101,7 +101,7 @@ export default function Announcement() {
                 )}
 
                 {/* الرأس: العنوان والمصدر */}
-                <div
+      {/* <div
                   style={{
                     display: "flex",
                     justifyContent: "between",
@@ -131,10 +131,10 @@ export default function Announcement() {
                   >
                     {adminAcc.senderName}
                   </span>
-                </div>
+                </div> */}
 
-                {/* المحتوى */}
-                <p
+      {/* المحتوى */}
+      {/* <p
                   style={{
                     color: "#4b5563",
                     fontSize: "15px",
@@ -143,10 +143,10 @@ export default function Announcement() {
                   }}
                 >
                   {adminAcc.content}
-                </p>
+                </p> */}
 
-                {/* أسفل الكرت: التاريخ والمرفقات */}
-                <div
+      {/* أسفل الكرت: التاريخ والمرفقات */}
+      {/* <div
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
@@ -182,16 +182,16 @@ export default function Announcement() {
             ))}
           </div>
         )}
-      </div>
+      </div> */}
 
-      <hr
-        style={{
-          border: "0",
-          height: "1px",
-          backgroundColor: "#e5e7eb",
-          margin: "30px 0",
-        }}
-      />
+      {/* // <hr
+      //   style={{
+      //     border: "0",
+      //     height: "1px",
+      //     backgroundColor: "#e5e7eb",
+      //     margin: "30px 0",
+      //   }}
+      // /> */}
 
       {/* هنا يتبع كودكِ الحالي تماماً: عنوان "الاعلانات الصادرة عني" وزر الإنشاء والكروت البيضاء */}
       <p
