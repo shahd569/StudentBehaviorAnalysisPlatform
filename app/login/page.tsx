@@ -49,6 +49,7 @@ export default function Login() {
         router.push("/Student_Dashboard");
       } else {
         alert("مرحباً بك أيها المدير");
+        router.push("/AdmainDashboard");
       }
     }
   };

@@ -44,27 +44,28 @@ export async function POST(request) {
       const line = lines[i].trim();
       if (!line) continue;
 
-      const [
-        employeeId,
-        firstName,
-        lastName,
-        teacherOverview,
-        teacherSpecialization,
-      ] = line.split(",");
+      const columns = line.includes(";") ? line.split(";") : line.split(",");
 
-      if (employeeId && firstName && lastName) {
-        staffToAuthorize.push({
-          employeeId: employeeId.trim(),
-          firstName: firstName.trim(),
-          lastName: lastName.trim(),
-          teacherOverview: teacherOverview.trim(),
-          teacherSpecialization: teacherSpecialization.trim(),
-          isRegistered: false,
-        });
-        uploadedEmployeeIds.push(employeeId.trim());
+      if (columns.length >= 5) {
+        const employeeId = columns[0].trim();
+        const firstName = columns[1].trim();
+        const lastName = columns[2].trim();
+        const teacherOverview = columns[3].trim();
+        const teacherSpecialization = columns[4].trim();
+
+        if (employeeId && firstName && lastName) {
+          staffToAuthorize.push({
+            employeeId: employeeId.trim(),
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            teacherOverview: teacherOverview.trim(),
+            teacherSpecialization: teacherSpecialization.trim(),
+            isRegistered: false,
+          });
+          uploadedEmployeeIds.push(employeeId.trim());
+        }
       }
     }
-
     if (staffToAuthorize.length === 0) {
       return NextResponse.json(
         {
@@ -87,7 +88,14 @@ export async function POST(request) {
 
     if (newStaffData.length === 0) {
       return NextResponse.json(
-        { message: "جميع الموظفين في الملف مضافون مسبقاً في النظام." },
+        {
+          message: "جميع الموظفين في الملف مضافون مسبقاً في النظام.",
+          statistics: {
+            totalInFile: staffToAuthorize.length,
+            // newlyAdded: result.count,
+            alreadyExists: existingIdsSet.size,
+          },
+        },
         { status: 200 },
       );
     }

@@ -20,7 +20,7 @@ export async function POST(request, { params }) {
       if (!file) {
         return NextResponse.json(
           { error: "لم يتم رفع أي ملف." },
-          { status: 400 },
+          { status: 402 },
         );
       }
 
@@ -54,20 +54,24 @@ export async function POST(request, { params }) {
       const line = lines[i].trim();
       if (!line) continue;
 
-      // تقسيم السطر بناءً على الفاصلة (,) الخاصة بملفات CSV
-      const [universityId, firstName, lastName] = line.split(",");
+      const columns = line.includes(";") ? line.split(";") : line.split(",");
 
-      if (universityId && firstName && lastName) {
-        studentsToAuthorize.push({
-          universityId: universityId.trim(),
-          firstName: firstName.trim(),
-          lastName: lastName.trim(),
-          isRegistered: false, // القيمة الافتراضية حتى يسجل الطالب بنفسه لاحقاً
-        });
-        uploadedUniversityIds.push(universityId.trim());
+      if (columns.length >= 3) {
+        const universityId = columns[0].trim();
+        const firstName = columns[1].trim();
+        const lastName = columns[2].trim();
+
+        if (universityId && firstName && lastName) {
+          studentsToAuthorize.push({
+            universityId: universityId.trim(),
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            isRegistered: false, // القيمة الافتراضية حتى يسجل الطالب بنفسه لاحقاً
+          });
+          uploadedUniversityIds.push(universityId.trim());
+        }
       }
     }
-
     if (studentsToAuthorize.length === 0) {
       return NextResponse.json(
         {
@@ -95,7 +99,14 @@ export async function POST(request, { params }) {
 
     if (newStudentsData.length === 0) {
       return NextResponse.json(
-        { message: "جميع الطلاب في الملف مضافون مسبقاً في النظام." },
+        {
+          message: "جميع الطلاب في الملف مضافون مسبقاً في النظام.",
+          statistics: {
+            totalInFile: studentsToAuthorize.length,
+            // newlyAdded: result.count,
+            alreadyExists: existingIdsSet.size,
+          },
+        },
         { status: 200 },
       );
     }

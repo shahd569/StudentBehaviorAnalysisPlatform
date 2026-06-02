@@ -27,7 +27,7 @@ export async function GET() {
         registrationDate: "desc",
       },
     });
-    return NextResponse.json(users);
+    return NextResponse.json({ users });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
