@@ -127,15 +127,16 @@ export default function Assignment() {
 
             <button
               style={{
-                borderRadius: "5px",
+                borderRadius: "8px",
                 backgroundColor: "#9f04f8",
                 color: "white",
                 boxShadow: "0 4px 4px #ccc",
-                width: "100px",
+                // width: "100px",
                 height: "40px",
                 textAlign: "center",
                 marginRight: "20px",
                 marginBottom: "15px",
+                width: "87%",
               }}
               onMouseEnter={(e) =>
                 (e.currentTarget.style.background = "#8c04db")

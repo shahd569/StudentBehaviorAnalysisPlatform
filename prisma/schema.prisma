@@ -66,7 +66,7 @@ model Course {
   semester      String
   instructorId  Int
   coursePictureUrl  String?
-  status        courseStatus
+  status        courseStatus?
   announcements Announcement[]
   instructor    Users          @relation("TaughtCourses", fields: [instructorId], references: [id], onDelete: Cascade)
   enrollments   Enrollment[]

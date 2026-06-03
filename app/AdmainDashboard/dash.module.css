@@ -1,7 +1,7 @@
-.gradientBackground{
-    background:linear-gradient(to bottom, #00183a,#19417a, #bfdbf1);
+.gradientBackground {
+  background: linear-gradient(to bottom, #00183a, #19417a, #bfdbf1);
 }
-.sidebar{
-    border-bottom-left-radius: 40px;
-    border-top-left-radius: 40px;
+.sidebar {
+  border-bottom-left-radius: 40px;
+  border-top-left-radius: 40px;
 }

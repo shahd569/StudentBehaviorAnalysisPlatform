@@ -5,13 +5,13 @@ import { authOptions } from "@/lib/auth";
 
 export async function DELETE(req, { params }) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || session.user.role !== "ADMIN") {
-      return NextResponse.json(
-        { message: "غير مصرح لك بالقيام بهذا الإجراء" },
-        { status: 401 },
-      );
-    }
+    // const session = await getServerSession(authOptions);
+    // if (!session || session.user.role !== "ADMIN") {
+    //   return NextResponse.json(
+    //     { message: "غير مصرح لك بالقيام بهذا الإجراء" },
+    //     { status: 401 },
+    //   );
+    // }
     const { id } = await params;
     const courseId = parseInt(id);
 
