@@ -77,12 +77,12 @@ export default function TeacherUploadModal() {
       </Button>
 
       <Modal show={show} onHide={() => setShow(false)} centered>
-        <Modal.Header closeButton style={{ backgroundColor: "#ddd7f5" }} />
+        <Modal.Header closeButton style={{ backgroundColor: "#d7dff5" }} />
 
         <Modal.Body
           style={{
             padding: "20px",
-            backgroundColor: "#ddd7f5",
+            backgroundColor: "#d7dff5",
           }}
         >
           <div

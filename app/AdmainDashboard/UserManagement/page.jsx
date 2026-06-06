@@ -160,7 +160,7 @@ export default function UsersTable() {
         fontSize: "18px",
       }}
     >
-      <h1 style={{ fontWeight: "bold", color: "black" }}>إدارة الستخدمين </h1>
+      <h1 style={{ fontWeight: "bold", color: "black" }}>إدارة المستخدمين </h1>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <div style={{ display: "flex", gap: "15px", marginBottom: "20px" }}>
           <div

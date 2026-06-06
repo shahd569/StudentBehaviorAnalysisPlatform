@@ -1,9 +1,19 @@
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
-export async function GET(req, { params }) {
-  const { studentId } = await params;
-  const id = parseInt(studentId);
+export async function GET() {
+  // const { studentId } = await params;
+  // const id = parseInt(studentId);
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) {
+    return NextResponse.json(
+      { message: "غير مصرح لك بالوصول" },
+      { status: 401 },
+    );
+  }
 
+  const id = parseInt(session.user.id);
   //  جلب البيانات
 
   const interactions = await prisma.videoInteraction.findMany({

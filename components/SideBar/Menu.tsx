@@ -48,20 +48,15 @@ export const links = [
     title: "التوصيات",
     url: "/Teacher_Dashboard/Recommendations",
   },
+
   {
     id: 6,
-    icon: faEnvelope,
-    title: "الرسائل",
-    url: "/Teacher_Dashboard/message",
-  },
-  {
-    id: 7,
     icon: faBullhorn,
     title: "الإعلانات",
     url: "/Teacher_Dashboard/Announcement",
   },
   {
-    id: 8,
+    id: 7,
     icon: faGear,
     title: "الإعدادات",
     url: "/Teacher_Dashboard/settings",

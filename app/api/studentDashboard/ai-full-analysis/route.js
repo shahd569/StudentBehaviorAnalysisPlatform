@@ -3,16 +3,16 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
 export async function GET() {
-  // const session = await getServerSession(authOptions);
-  // if (!session || !session.user) {
-  //   return NextResponse.json(
-  //     { message: "غير مصرح لك بالوصول" },
-  //     { status: 401 },
-  //   );
-  // }
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) {
+    return NextResponse.json(
+      { message: "غير مصرح لك بالوصول" },
+      { status: 401 },
+    );
+  }
 
-  // const id = parseInt(session.user.id);
-  const id = 15;
+  const id = parseInt(session.user.id);
+  // const id = 15;
   // جلب البيانات
   const interactions = await prisma.videoInteraction.findMany({
     where: { studentId: id },

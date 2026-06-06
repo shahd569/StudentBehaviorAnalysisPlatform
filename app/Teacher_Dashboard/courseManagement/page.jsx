@@ -14,7 +14,7 @@ export default function Assignment() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await fetch("/api/adminDashboard/coursesManagement/get");
+        const res = await fetch("/api/teacherDashboard/teacherCourses");
         const data = await res.json();
 
         if (res.ok) {

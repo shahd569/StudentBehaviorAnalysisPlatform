@@ -5,17 +5,17 @@ import { authOptions } from "@/lib/auth";
 
 export async function GET() {
   try {
-    // const session = await getServerSession(authOptions);
-    // if (!session || session.user.role !== "ADMIN") {
-    //   return NextResponse.json(
-    //     { message: "غير مصرح لك بالقيام بهذا الإجراء" },
-    //     { status: 401 },
-    //   );
-    // }
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== "ADMIN") {
+      return NextResponse.json(
+        { message: "غير مصرح لك بالقيام بهذا الإجراء" },
+        { status: 401 },
+      );
+    }
 
     const lastRegisteredUsers = await prisma.Users.findMany({
       orderBy: { registrationDate: "desc" },
-      take: 4,
+      take: 6,
       select: {
         id: true,
         firstName: true,

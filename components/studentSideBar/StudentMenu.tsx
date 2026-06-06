@@ -48,7 +48,7 @@ export const links = [
     id: 6,
     icon: faLightbulb,
     title: "التوصيات",
-    url: "/Student_Dashboard/recommendations",
+    url: "/Student_Dashboard/Recommendations",
   },
   {
     id: 7,

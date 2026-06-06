@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHome } from "@fortawesome/free-solid-svg-icons";
+import { faBullhorn, faHome, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { faUserGraduate } from "@fortawesome/free-solid-svg-icons";
 import { faBook } from "@fortawesome/free-solid-svg-icons";
 import { faClipboardList } from "@fortawesome/free-solid-svg-icons";
@@ -16,19 +16,19 @@ export const links = [
   },
   {
     id: 1,
-    icon: faBook,
+    icon: faUsers,
     title: "إدارة المستخدمين",
     url: "/AdmainDashboard/UserManagement",
   },
   {
     id: 3,
-    icon: faClipboardList,
+    icon: faBook,
     title: "إدارة المقررات ",
     url: "/AdmainDashboard/CoursesManagement",
   },
   {
     id: 4,
-    icon: faTasks,
+    icon: faBullhorn,
     title: "الإعلانات",
     url: "/AdmainDashboard/Announcement",
   },
@@ -36,6 +36,6 @@ export const links = [
     id: 7,
     icon: faGear,
     title: "الإعدادات",
-    url: "/Student_Dashboard/settings",
+    url: "/AdmainDashboard/settings",
   },
 ];

@@ -78,9 +78,13 @@ export async function GET() {
         registrationDate: {
           gte: earliestDate,
         },
+        role: {
+          in: ["STUDENT", "TEACHER"],
+        },
       },
       select: {
         registrationDate: true,
+        role: true,
       },
     });
 
@@ -89,14 +93,24 @@ export async function GET() {
     users.forEach((user) => {
       const registeredAt = new Date(user.registrationDate);
       const key = `${registeredAt.getFullYear()}-${registeredAt.getMonth()}`;
-      countsMap.set(key, (countsMap.get(key) ?? 0) + 1);
+      const current = countsMap.get(key) ?? { students: 0, teachers: 0 };
+
+      if (user.role === "STUDENT") {
+        current.students += 1;
+      } else if (user.role === "TEACHER") {
+        current.teachers += 1;
+      }
+
+      countsMap.set(key, current);
     });
 
     const formattedCounts = monthlyCounts.map((item) => {
       const key = `${item.year}-${item.monthIndex}`;
+      const counts = countsMap.get(key) ?? { students: 0, teachers: 0 };
       return {
         month: item.month,
-        count: countsMap.get(key) ?? 0,
+        studentsCount: counts.students,
+        teachersCount: counts.teachers,
       };
     });
 
