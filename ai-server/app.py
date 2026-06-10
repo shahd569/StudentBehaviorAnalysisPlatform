@@ -80,6 +80,38 @@ def predict_final():
         return jsonify({"error": str(e)}), 400
 
 
+
+@app.route("/predict-progress", methods=["POST"])
+def predict_progress():
+
+    try:
+
+        data = request.get_json()
+
+        history = [[
+            data["day_1"],
+            data["day_2"],
+            data["day_3"],
+            data["day_4"],
+            data["day_5"],
+            data["day_6"],
+            data["day_7"]
+        ]]
+
+        result = explain_prediction(
+            model,
+            history
+        )
+
+        return jsonify(result)
+
+    except Exception as e:
+
+        return jsonify({
+            "error": str(e)
+        }), 400
+
+
 # تشغيل السيرفر
 if __name__ == "__main__":
     app.run(port=5000)

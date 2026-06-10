@@ -2,10 +2,15 @@
 
 import List from "@/components/studentRecommendation";
 import Card from "@/components/StudentRecoCards";
+import GeneralRecommendations from "@/components/generalRecommendation";
+import QuizRecommendations from "@/components/quizRecommendation";
+
 import { useEffect, useState } from "react";
 
 export default function Recommendations() {
   const [recommendations, setRecommendations] = useState([]);
+  const [generalRecommendations, setGeneralRecommendations] = useState([]);
+  const [quizRecommendations, setQuizRecommendations] = useState([]);
   const [fullAnalysis, setFullAnalysis] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -39,8 +44,13 @@ export default function Recommendations() {
       try {
         const res = await fetch("/api/studentDashboard/ai-full-analysis");
         const result = await res.json();
+
         if (res.ok) {
-          setFullAnalysis(result);
+          setFullAnalysis(result.analysis);
+
+          setGeneralRecommendations(result.generalRecommendations || []);
+
+          setQuizRecommendations(result.quizRecommendations || []);
         }
       } catch (error) {
         console.error("Error fetching recommendations data:", error);
@@ -72,11 +82,17 @@ export default function Recommendations() {
       <div>
         <h1 style={{ fontWeight: "bold" }}>التوصيات الذكية</h1>
       </div>
-
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <Card stats={fullAnalysis} />
+        <div style={{ flex: "2" }}></div>
+      </div>
       <div style={{ display: "flex", gap: "30px" }}>
         <List recommendations={recommendations} />
-        <Card stats={fullAnalysis} />
+        <GeneralRecommendations
+          generalRecommendation={generalRecommendations}
+        />
       </div>
+      <QuizRecommendations quizRecommendations={quizRecommendations} />
     </div>
   );
 }

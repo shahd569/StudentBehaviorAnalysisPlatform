@@ -19,7 +19,7 @@ export default function Cards({ stats }) {
         }}
       >
         <p>توقع الأداء النهائي</p>
-        <p>{stats.analysis.performancePrediction}</p>
+        <p>{stats.performancePrediction}</p>
       </div>
 
       {/* مستوى التفاعل*/}
@@ -36,7 +36,7 @@ export default function Cards({ stats }) {
         }}
       >
         <p>مستوى التفاعل</p>
-        <p>{stats.analysis.engagementLevel}</p>
+        <p>{stats.engagementLevel}</p>
       </div>
 
       {/* مستوى الخطر */}
@@ -52,8 +52,8 @@ export default function Cards({ stats }) {
           alignItems: "center",
         }}
       >
-        <p>مستوى الخطر</p>
-        <p>{stats.analysis.riskLevel}</p>
+        <p>مستوى الأداء الحالي</p>
+        <p>{stats.riskLevel}</p>
       </div>
     </div>
   );

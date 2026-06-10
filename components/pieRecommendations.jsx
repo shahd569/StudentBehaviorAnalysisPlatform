@@ -5,17 +5,17 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 export default function CustomActiveShapePieChart({ data }) {
   const sData = [
     {
-      name: "طلاب في خطر",
+      name: "مستوى أداء منخفض",
       value: data?.atRisk || 0,
       color: "#ff4d4f",
     },
     {
-      name: "طلاب على الحافة",
+      name: "مستوى أداء متوسط",
       value: data?.borderline || 0,
       color: "#ffb703",
     },
     {
-      name: "طلاب آمنون",
+      name: "مستوى أداء عالي",
       value: data?.safe || 0,
       color: "#22c55e",
     },
@@ -33,7 +33,7 @@ export default function CustomActiveShapePieChart({ data }) {
         gap: "40px",
       }}
     >
-      <h4 style={{ marginBottom: "20px" }}>توزيع الطلاب حسب مستوى الخطر</h4>
+      <h4 style={{ marginBottom: "20px" }}>توزيع الطلاب حسب مستوى الاداء</h4>
 
       <ResponsiveContainer width="100%" height="90%">
         <PieChart>

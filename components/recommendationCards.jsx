@@ -89,7 +89,7 @@ export default function Cards({ stats }) {
             alignItems: "center",
           }}
         >
-          <p>طلاب في خطر</p>
+          <p>مستوى أداء منخفض</p>
 
           <div
             style={{
@@ -109,7 +109,7 @@ export default function Cards({ stats }) {
           </div>
         </div>
 
-        <p>{stats.atRisk}</p>
+        <p>{stats.atRisk} طلاب</p>
 
         <p style={{ color: "gray" }}>{getPercentage(stats.atRisk)}% من الصف</p>
       </div>
@@ -131,7 +131,7 @@ export default function Cards({ stats }) {
             alignItems: "center",
           }}
         >
-          <p>طلاب على الحافة </p>
+          <p>مستوى أداء متوسط</p>
 
           <div
             style={{
@@ -151,7 +151,7 @@ export default function Cards({ stats }) {
           </div>
         </div>
 
-        <p>{stats.borderline}</p>
+        <p>{stats.borderline} طلاب</p>
 
         <p style={{ color: "gray" }}>
           {getPercentage(stats.borderline)}% من الصف
@@ -175,7 +175,7 @@ export default function Cards({ stats }) {
             alignItems: "center",
           }}
         >
-          <p>طلاب آمنون</p>
+          <p>مستوى أداء عالي</p>
 
           <div
             style={{
@@ -192,7 +192,7 @@ export default function Cards({ stats }) {
           </div>
         </div>
 
-        <p>{stats.safe}</p>
+        <p>{stats.safe} طلاب</p>
 
         <p style={{ color: "gray" }}>{getPercentage(stats.safe)}% من الصف</p>
       </div>

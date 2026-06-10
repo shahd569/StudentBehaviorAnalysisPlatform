@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import AddCourse from "@/components/addCourseModal";
+import StudentUpload from "@/components/studentEnroll";
+
 import Image from "next/image";
 // import Teacher from "@/public/image/odoo.jpg";
 
@@ -11,10 +13,18 @@ import {
   faBookOpen,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
+import { useRouter } from "next/navigation";
 
 export default function Courses() {
   const [courses, setCourses] = useState([]);
+  const [fileName, setFileName] = useState("اختر ملف CSV");
+  const [loading, setLoading] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState({});
+  const [loadingCourse, setLoadingCourse] = useState(null);
+  const [hoveredCount, setHoveredCount] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
+  const router = useRouter();
   const fetchCourses = async () => {
     try {
       const res = await fetch("/api/adminDashboard/coursesManagement/get");
@@ -25,9 +35,6 @@ export default function Courses() {
       console.error(error);
     }
   };
-
-  const [selectedFiles, setSelectedFiles] = useState({});
-  const [loadingCourse, setLoadingCourse] = useState(null);
 
   const handleFileChange = (courseId, e) => {
     const file = e.target.files?.[0];
@@ -116,6 +123,65 @@ export default function Courses() {
     }
   };
 
+  const handleEFileChange = (e) => {
+    const file = e.target.files?.[0];
+
+    if (!file) {
+      setSelectedFile(null);
+      setFileName("اختر ملف CSV");
+      return;
+    }
+
+    setSelectedFile(file);
+    setFileName(file.name);
+  };
+
+  const handleStudentEUpload = async () => {
+    if (!selectedFile) {
+      alert("يرجى اختيار ملف أولاً");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedFiles);
+
+      const res = await fetch(
+        "/api/adminDashboard/studentsEnrollmentInfo/deleteAllStudentEnroll",
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
+
+      const result = await res.json();
+
+      if (res.ok) {
+        const deletedEnrollmentsCount =
+          result.statistics?.deletedEnrollmentsCount ?? 0;
+        const totalInFileCount = result.statistics?.totalInFile ?? 0;
+        const foundInSystem = result.statistics?.foundInSystem ?? 0;
+        alert(
+          `${result.message}\nعدد الطلاب الذين تم إلغاء تسجيلهم: ${deletedEnrollmentsCount}\nعدد الطلاب الموجودين بالفعل: ${foundInSystem}\nعدد الطلاب في الملف: ${totalInFileCount}
+`,
+        );
+        setSelectedFile(null);
+        setFileName("اختر ملف CSV");
+      } else {
+        alert(
+          `فشل الرفع: ${result.error || result.message || "خطأ غير معروف"}`,
+        );
+      }
+    } catch (error) {
+      console.error("FRONTEND UPLOAD ERROR:", error);
+      alert("حدث خطأ في معالجة البيانات بالواجهة أو انقطع الاتصال بالخادم");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div
       style={{
@@ -131,13 +197,58 @@ export default function Courses() {
       <div
         style={{
           display: "flex",
-          justifyContent: "flex-end",
+          flexDirection: "row",
+          justifyContent: "flex-between",
           alignItems: "center",
+          // gap: "20px",
+          marginLeft: "20px",
         }}
       >
         <AddCourse />
+        <div style={{ display: "flex", gap: "15px", marginBottom: "20px" }}>
+          <div
+            style={{
+              border: "1px solid #eee",
+              borderRadius: "50px",
+              padding: "5px 35px",
+              width: "250px",
+            }}
+          >
+            <input
+              type="file"
+              accept=".csv"
+              onChange={handleEFileChange}
+              style={{ display: "none" }} // إخفاء الإدخال الافتراضي
+              id="file-upload"
+            />
+            <label
+              htmlFor="file-upload"
+              style={{
+                cursor: "pointer",
+              }}
+            >
+              {fileName}
+            </label>
+          </div>
+          <button
+            onClick={handleStudentEUpload}
+            disabled={loading}
+            style={{
+              backgroundColor: "#d7dff5",
+              border: "none",
+              borderRadius: "10px",
+              padding: "5px",
+              cursor: loading ? "not-allowed" : "pointer",
+              paddingLeft: "15px",
+              paddingRight: "15px",
+            }}
+          >
+            {loading
+              ? "جاري المعالجة والرفع..."
+              : "رفع قائمة الطلاب لإلغاء تسجيلهم"}
+          </button>
+        </div>
       </div>
-
       <div
         style={{
           display: "grid",
@@ -158,7 +269,7 @@ export default function Courses() {
               gap: "10px",
               boxShadow: "0 3px 10px rgba(0,0,0,0.1)",
               transition: "0.2s",
-              cursor: "pointer",
+              // cursor: "pointer",
             }}
           >
             <div
@@ -211,14 +322,23 @@ export default function Courses() {
                 style={{
                   display: "flex",
                   gap: "10px",
+                  cursor: "pointer",
                 }}
+                onClick={() =>
+                  router.push(`/AdmainDashboard/CoursesManagement/${course.id}`)
+                }
+                onMouseEnter={() => setHoveredCount(`students-${course.id}`)}
+                onMouseLeave={() => setHoveredCount(null)}
               >
                 <FontAwesomeIcon icon={faUsers} color="#00217a" />
 
                 <p
                   style={{
                     fontSize: "16px",
-                    color: "#646464",
+                    color:
+                      hoveredCount === `students-${course.id}`
+                        ? "#7ebbea"
+                        : "#646464",
                   }}
                 >
                   عدد الطلاب المسجلين : {course.enrollments}
@@ -229,14 +349,25 @@ export default function Courses() {
                 style={{
                   display: "flex",
                   gap: "10px",
+                  cursor: "pointer",
                 }}
+                onClick={() =>
+                  router.push(
+                    `/AdmainDashboard/CoursesManagement/${course.id}/lessonsInfo`,
+                  )
+                }
+                onMouseEnter={() => setHoveredCount(`lessons-${course.id}`)}
+                onMouseLeave={() => setHoveredCount(null)}
               >
                 <FontAwesomeIcon icon={faBookOpen} color="#00217a" />
 
                 <p
                   style={{
                     fontSize: "16px",
-                    color: "#646464",
+                    color:
+                      hoveredCount === `lessons-${course.id}`
+                        ? "#7ebbea"
+                        : "#646464",
                   }}
                 >
                   عدد الدروس : {course.lessons}
@@ -314,29 +445,43 @@ export default function Courses() {
                   : "تسجيل الطلاب"}
               </button>
             </div>
-
-            <button
-              onClick={() => handleDelete(course.id)}
+            <div
               style={{
-                borderRadius: "8px",
-                border: "2px solid #dc3545",
-                color: "red",
-                width: "70px",
-                height: "40px",
-                textAlign: "center",
-                marginRight: "20px",
-                marginBottom: "15px",
+                display: "flex",
+                flexDirection: "row",
+                gap: "12px",
                 marginTop: "10px",
+                alignItems: "center",
               }}
             >
-              <FontAwesomeIcon
-                icon={faTrash}
+              <StudentUpload courseId={course.id} fetchCourses={fetchCourses} />
+              <button
+                onClick={() => handleDelete(course.id)}
                 style={{
-                  color: "#dc3545",
-                  fontSize: "18px",
+                  borderRadius: "8px",
+                  border: "2px solid #dc3545",
+                  color: "red",
+                  width: "80px",
+                  height: "40px",
+                  // textAlign: "center",
+                  // marginRight: "120px",
+                  // marginBottom: "15px",
+                  marginTop: "20px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
                 }}
-              />
-            </button>
+              >
+                <FontAwesomeIcon
+                  icon={faTrash}
+                  style={{
+                    color: "#dc3545",
+                    fontSize: "18px",
+                  }}
+                />
+              </button>
+            </div>
           </div>
         ))}
       </div>

@@ -1,9 +1,9 @@
 "use client";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBookOpen, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faTasks } from "@fortawesome/free-solid-svg-icons";
 
-export default function RecommendationsList({ recommendations = [] }) {
+export default function RecommendationsList({ generalRecommendation = [] }) {
   return (
     <div
       style={{
@@ -25,7 +25,7 @@ export default function RecommendationsList({ recommendations = [] }) {
         }}
       >
         <FontAwesomeIcon
-          icon={faBookOpen}
+          icon={faTasks}
           style={{
             color: "#7c9efc",
             fontSize: "28px",
@@ -38,14 +38,14 @@ export default function RecommendationsList({ recommendations = [] }) {
             fontWeight: "bold",
           }}
         >
-          توصيات المحتوى الدراسي
+          جدول التوصيات
         </h4>
       </div>
 
       <hr />
 
-      {recommendations.length > 0 ? (
-        recommendations.map((item, index) => (
+      {generalRecommendation.length > 0 ? (
+        generalRecommendation.map((item, index) => (
           <div key={index}>
             <p
               style={{
@@ -58,7 +58,7 @@ export default function RecommendationsList({ recommendations = [] }) {
               {item.content || item}
             </p>
 
-            {index < recommendations.length - 1 && (
+            {index < generalRecommendation.length - 1 && (
               <hr
                 style={{
                   borderColor: "#e5e7eb",

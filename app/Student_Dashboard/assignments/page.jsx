@@ -154,7 +154,7 @@ export default function Assignment() {
               style={{ color: "gray", fontSize: "18px" }}
               eventKey="second"
             >
-              متاحة
+              غير المُقدَّمة
             </Nav.Link>
           </Nav.Item>
         </Nav>
