@@ -34,6 +34,8 @@ export async function GET(req, { params }) {
           college: true,
           major: true,
           academicYear: true,
+          attempt: true,
+          assignmentSubmission: true,
           // جلب كل الجلسات لحساب "عدد مرات الدخول" و وقت الجلسة
           sessions: {
             orderBy: { startTime: "desc" },
@@ -332,21 +334,21 @@ export async function GET(req, { params }) {
     else performanceStatus = "ضعيف";
 
     // حساب التقدير المتوقع
-    let trend = "مستقر";
-    if (recentAttempts.length === 2) {
-      const currentScore = recentAttempts[0].score; // الاختبار الأحدث
-      const previousScore = recentAttempts[1].score; // الاختبار الذي قبله
+    // let trend = "مستقر";
+    // if (recentAttempts.length === 2) {
+    //   const currentScore = recentAttempts[0].score; // الاختبار الأحدث
+    //   const previousScore = recentAttempts[1].score; // الاختبار الذي قبله
 
-      const difference = currentScore - previousScore;
+    //   const difference = currentScore - previousScore;
 
-      if (difference > 5) {
-        trend = "في ارتفاع 📈"; // تحسن ملحوظ
-      } else if (difference < -5) {
-        trend = "في انخفاض 📉"; // تراجع ملحوظ
-      } else {
-        trend = "مستقر 📊"; // الفرق بسيط
-      }
-    }
+    //   if (difference > 5) {
+    //     trend = "في ارتفاع 📈"; // تحسن ملحوظ
+    //   } else if (difference < -5) {
+    //     trend = "في انخفاض 📉"; // تراجع ملحوظ
+    //   } else {
+    //     trend = "مستقر 📊"; // الفرق بسيط
+    //   }
+    // }
 
     // مخطط الاداء
     // معالجة البيانات لتجميعها حسب الشهر
@@ -392,6 +394,91 @@ export async function GET(req, { params }) {
         average: avg,
       };
     });
+
+    /// ****************************************  ////////
+    // 1. تحديد تواريخ الأيام السبعة الماضية (من الأقدم للأحدث)
+    const last7Days = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (6 - i)); // من اليوم - 6 إلى اليوم الحالي
+      d.setHours(0, 0, 0, 0);
+      return d;
+    });
+
+    // 2. تحضير المصفوفة التي ستُرسل للذكاء الاصطناعي
+    const chartData7Days = last7Days.map((date) => {
+      const nextDate = new Date(date);
+      nextDate.setDate(nextDate.getDate() + 1);
+
+      // أ. حساب تفاعلات الفيديو في هذا اليوم
+      const videoInteractionsCount = studentData.interactions.filter(
+        (inter) => {
+          const interDate = new Date(inter.timestamp);
+          return interDate >= date && interDate < nextDate;
+        },
+      ).length;
+
+      // ب. حساب جلسات الدخول للمنصة في هذا اليوم (مؤشر النشاط الأساسي)
+      const sessionsCount = studentData.sessions.filter((session) => {
+        const sessionDate = new Date(session.startTime);
+        return sessionDate >= date && sessionDate < nextDate;
+      }).length;
+
+      // ج. حساب محاولات الكويزات في هذا اليوم
+      const quizAttemptsCount = studentData.attempt.filter((att) => {
+        const attDate = new Date(att.startTime);
+        return attDate >= date && attDate < nextDate;
+      }).length;
+
+      // د. حساب تسليمات الواجبات في هذا اليوم
+      const assignmentSubmissionsCount =
+        studentData.assignmentSubmission.filter((sub) => {
+          const subDate = new Date(sub.submittedAt); // تأكدي من مسمى الحقل في النموذج الخاص بكِ (غالباً submittedAt أو createdAt)
+          return subDate >= date && subDate < nextDate;
+        }).length;
+
+      // المجموع الإجمالي للنشاط في هذا اليوم المحدد
+      const totalDailyActivity =
+        videoInteractionsCount +
+        sessionsCount +
+        quizAttemptsCount +
+        assignmentSubmissionsCount;
+
+      return {
+        date: date.toLocaleDateString("en-US", { weekday: "short" }), // أو أي صيغة للتشارت
+        count: totalDailyActivity, // هذا الرقم الفعلي للنشاط
+      };
+    });
+
+    // 3. بناء مصفوفة الخصائص (Features) لنموذج Flask بالترتيب الصحيح
+    const aiFeatures = chartData7Days.map((item) => item.count);
+    // ستنتج مصفوفة مثل: [2, 0, 5, 1, 3, 0, 4] تعبر عن النشاط الحقيقي بكل المنصة
+
+    // 4. إرسال الطلب إلى Flask بيقين تام بالبيانات
+    const aiProgressResponse = await fetch(
+      "http://127.0.0.1:5000/predict-progress",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          day_1: aiFeatures[0],
+          day_2: aiFeatures[1],
+          day_3: aiFeatures[2],
+          day_4: aiFeatures[3],
+          day_5: aiFeatures[4],
+          day_6: aiFeatures[5],
+          day_7: aiFeatures[6],
+        }),
+      },
+    );
+
+    const aiProgressResult = await aiProgressResponse.json();
+
+    // تحويل مخرجات الذكاء الاصطناعي إلى نصوص برمجية تتوافق مع واجهتكِ (مستقر - في ارتفاع - في انخفاض)
+    let predictedTrend = "مستقر";
+    if (aiProgressResult.prediction === "Good") predictedTrend = "في ارتفاع";
+    if (aiProgressResult.prediction === "At Risk") predictedTrend = "في انخفاض";
+
+    /// ****************************************  ////////
 
     //Assignments
     const formattedAssignments = assignments.map((a) => {
@@ -455,7 +542,10 @@ export async function GET(req, { params }) {
         performance: {
           performanceStatus,
           percentageScore,
-          trend,
+          // trend,
+          trend: predictedTrend, // القيمة القادمة ديناميكياً من تنبؤ الذكاء الاصطناعي الحالي
+          confidence: aiProgressResult.confidence * 100, // نسبة اليقين مئوية
+          reasons: aiProgressResult.reasons,
           charData,
         },
         formattedAssignments,

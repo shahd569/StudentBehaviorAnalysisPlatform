@@ -15,7 +15,9 @@ const PerformanceChart = ({ data }) => {
 
   return (
     <div style={{ width: "600px", marginTop: "-40px" }}>
-      <h4 style={{ textAlign: "center" }}>تحليل أداء الطالب شهرياً</h4>
+      <h4 style={{ textAlign: "center" }}>
+        تحليل أداء الطالب في الاختبارات شهرياً
+      </h4>
       <LineChart
         style={{
           width: "100%",

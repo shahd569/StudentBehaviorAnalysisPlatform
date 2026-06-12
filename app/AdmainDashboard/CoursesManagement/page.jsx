@@ -197,57 +197,56 @@ export default function Courses() {
       <div
         style={{
           display: "flex",
-          flexDirection: "row",
-          justifyContent: "flex-between",
+          justifyContent: "space-between",
           alignItems: "center",
-          // gap: "20px",
           marginLeft: "20px",
         }}
       >
-        <AddCourse />
-        <div style={{ display: "flex", gap: "15px", marginBottom: "20px" }}>
-          <div
+        
+        <div style={{ display: "flex", gap: "15px"}}>
+        <div
+          style={{
+            border: "1px solid #eee",
+            borderRadius: "50px",
+            padding: "5px 35px",
+            width: "250px",
+          }}
+        >
+          <input
+            type="file"
+            accept=".csv"
+            onChange={handleEFileChange}
+            style={{ display: "none" }} // إخفاء الإدخال الافتراضي
+            id="file-upload"
+          />
+          <label
+            htmlFor="file-upload"
             style={{
-              border: "1px solid #eee",
-              borderRadius: "50px",
-              padding: "5px 35px",
-              width: "250px",
+              cursor: "pointer",
             }}
           >
-            <input
-              type="file"
-              accept=".csv"
-              onChange={handleEFileChange}
-              style={{ display: "none" }} // إخفاء الإدخال الافتراضي
-              id="file-upload"
-            />
-            <label
-              htmlFor="file-upload"
-              style={{
-                cursor: "pointer",
-              }}
-            >
-              {fileName}
-            </label>
-          </div>
-          <button
-            onClick={handleStudentEUpload}
-            disabled={loading}
-            style={{
-              backgroundColor: "#d7dff5",
-              border: "none",
-              borderRadius: "10px",
-              padding: "5px",
-              cursor: loading ? "not-allowed" : "pointer",
-              paddingLeft: "15px",
-              paddingRight: "15px",
-            }}
-          >
-            {loading
-              ? "جاري المعالجة والرفع..."
-              : "رفع قائمة الطلاب لإلغاء تسجيلهم"}
-          </button>
+            {fileName}
+          </label>
         </div>
+        <button
+          onClick={handleStudentEUpload}
+          disabled={loading}
+          style={{
+            backgroundColor: "#d7dff5",
+            border: "none",
+            borderRadius: "10px",
+            padding: "5px",
+            cursor: loading ? "not-allowed" : "pointer",
+            paddingLeft: "15px",
+            paddingRight: "15px",
+          }}
+        >
+          {loading
+            ? "جاري المعالجة والرفع..."
+            : "رفع قائمة الطلاب لإلغاء تسجيلهم"}
+        </button>
+      </div>
+      <AddCourse />
       </div>
       <div
         style={{
@@ -461,8 +460,8 @@ export default function Courses() {
                   borderRadius: "8px",
                   border: "2px solid #dc3545",
                   color: "red",
-                  width: "80px",
-                  height: "40px",
+                  width: "45px",
+                  height: "30px",
                   // textAlign: "center",
                   // marginRight: "120px",
                   // marginBottom: "15px",

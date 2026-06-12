@@ -31,7 +31,7 @@ const Table = ({ assignments }) => {
           <th>المادة</th>
           <th>عدد الطلاب </th>
           <th>تم التسليم </th>
-          <th>متأخر </th>
+          <th>لم يسلم </th>
           <th style={{ borderRadius: "10px 0 0 10px" }}>إجراء</th>
         </tr>
       </thead>
