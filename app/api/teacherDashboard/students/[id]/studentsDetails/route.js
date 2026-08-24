@@ -193,8 +193,21 @@ export async function GET(req, { params }) {
         sessionsWithEnd++;
       }
     });
-    const avgSessionTime =
-      sessionsWithEnd > 0 ? Math.round(totalMinutes / sessionsWithEnd) : 0;
+    // احتساب متوسط الوقت لكل جلسة بالـدقائق (للتوافق مع الواجهة الحالية)
+    const avgMinutesPerSession =
+      sessionsWithEnd > 0 ? totalMinutes / sessionsWithEnd : 0;
+
+    // رقم بالدقائق (مقرب) للحقل القديم
+    const avgSessionTime = Math.round(avgMinutesPerSession);
+
+    // نفس القيمة بالساعات (عشري بدقة خانة عشرية)
+    const avgSessionTimeHours =
+      sessionsWithEnd > 0 ? Number((avgMinutesPerSession / 60).toFixed(1)) : 0;
+
+    // تمثيل نصي عربي مثل: "2 ساعة و 15 دقيقة"
+    const hoursPart = Math.floor(avgMinutesPerSession / 60);
+    const minutesPart = Math.round(avgMinutesPerSession % 60);
+    const avgSessionTimeLabel = `${hoursPart} ساعة و ${minutesPart} دقيقة`;
 
     // حساب عدد الأيام النشطة (تواريخ فريدة)
     const activeDaysSet = new Set(
@@ -532,6 +545,8 @@ export async function GET(req, { params }) {
         statistics: {
           loginCount: loginCount,
           avgSessionTime: avgSessionTime,
+          avgSessionTimeHours: avgSessionTimeHours,
+          avgSessionTimeLabel: avgSessionTimeLabel,
           activeDays: activeDaysCount,
           activityStatus: activityStatus,
           recentSessionsCount: recentSessionsCount,

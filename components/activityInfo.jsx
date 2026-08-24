@@ -50,7 +50,7 @@ const StudentDetails = ({ data }) => {
             marginRight: "5px",
           }}
         >
-          {data.avgSessionTime} دقيقة
+          {data.avgSessionTimeLabel || `${data.avgSessionTime} دقيقة`}
         </p>
       </div>
       <div
